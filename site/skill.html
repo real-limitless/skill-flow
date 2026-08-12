@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skill — skill-flow</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/config.js"></script>
+  </head>
+  <body data-page="skill">
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" data-site-href="/" href="./">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </a>
+        <div class="meta-pills">
+          <a class="pill" href="catalog.html">← Catalog</a>
+          <a class="pill" data-repo href="https://github.com/real-limitless/skill-flow">GitHub</a>
+        </div>
+      </header>
+      <div id="skill-detail" style="padding-top: 24px; padding-bottom: 48px"></div>
+    </div>
+    <script type="module" src="assets/site.js"></script>
+    <style>
+      .code-block {
+        margin: 0;
+        padding: 16px 18px;
+        background: #0a0e14;
+        border-top: 1px solid var(--rail);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--mute);
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .tag {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        padding: 6px 10px;
+        border: 1px solid var(--rail);
+        color: var(--mute);
+      }
+      .tag.hot {
+        color: var(--accent-hot);
+        border-color: rgba(45, 212, 191, 0.4);
+      }
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+    </style>
+  </body>
+</html>

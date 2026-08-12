@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Why — skill-flow</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body class="frame-body">
+    <div class="canvas" id="frame">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </div>
+        <div class="meta-pills">
+          <span class="pill accent">Why it exists</span>
+          <span class="pill vault">Skill sprawl</span>
+        </div>
+      </header>
+
+      <div class="main" style="margin-top: 12px">
+        <p class="eyebrow">The failure mode we refuse</p>
+        <h2 class="section-title" style="max-width: 28ch; margin-bottom: 10px">
+          Expertise trapped in zip files and tribal paths.
+        </h2>
+        <p class="lede" style="margin-bottom: 28px">
+          Every harness wants SKILL.md in a different folder. Teams paste skills by hand, skip
+          audits, and lose track of what agents can load. That is not a control plane.
+        </p>
+
+        <div class="compare">
+          <div class="panel col bad">
+            <h3>Without skill-flow</h3>
+            <ul>
+              <li>Manual drag-drop into <span class="mono">~/.claude/skills</span> only</li>
+              <li>No shared gallery — each laptop a different set</li>
+              <li>Unvetted scripts and prompt injections in “helpful” skills</li>
+              <li>OpenCode / Cursor / Codex never see the same library</li>
+            </ul>
+          </div>
+          <div class="panel col good">
+            <h3>With skill-flow</h3>
+            <ul>
+              <li>One catalog: search, show, audit before install</li>
+              <li>Adapters write native paths for each harness</li>
+              <li>Portable <span class="mono">.agents/skills</span> default for multi-agent teams</li>
+              <li>Install requires confirm — scripts never run by the plane</li>
+            </ul>
+          </div>
+        </div>
+
+        <div
+          class="panel"
+          style="margin-top: 20px; padding: 16px 20px; display: flex; gap: 32px; align-items: center"
+        >
+          <div style="flex: 1">
+            <div
+              class="mono"
+              style="
+                font-size: 11px;
+                color: var(--vault-hot);
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                margin-bottom: 6px;
+              "
+            >
+              Why you need it
+            </div>
+            <div style="font-size: 16px; line-height: 1.4; color: var(--ink)">
+              You want agents with specialized skills — not a folder of unknown markdown nobody
+              audited.
+            </div>
+          </div>
+          <div class="mono" style="font-size: 12px; color: var(--mute); text-align: right; line-height: 1.6">
+            Open standard<br />
+            <span style="color: var(--phosphor)">agentskills.io · SKILL.md</span>
+          </div>
+        </div>
+      </div>
+
+      <footer class="frame-foot">
+        <span>Campaign · Why</span>
+        <span>Security is audit + confirm + filesystem placement</span>
+      </footer>
+    </div>
+  </body>
+</html>

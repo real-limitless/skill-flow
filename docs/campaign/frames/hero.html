@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hero — skill-flow</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body class="frame-body">
+    <div class="canvas" id="frame">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </div>
+        <div class="meta-pills">
+          <span class="pill accent">Agent Skills</span>
+          <span class="pill on">Self-hosted</span>
+          <span class="pill">Apache-2.0</span>
+        </div>
+      </header>
+
+      <div class="inv-rail" aria-label="Plane rail">
+        <div class="inv-slot gw">
+          <span class="role">Control plane</span>
+          <span class="host">skill-flow · MCP</span>
+          <span class="led"></span>
+        </div>
+        <div class="inv-slot ok">
+          <span class="role">Catalog</span>
+          <span class="host">SKILL.md gallery</span>
+          <span class="led"></span>
+        </div>
+        <div class="inv-slot ok">
+          <span class="role">Harness</span>
+          <span class="host">OpenCode · Claude</span>
+          <span class="led"></span>
+        </div>
+        <div class="inv-slot sealed">
+          <span class="role">Portable</span>
+          <span class="host">.agents/skills</span>
+          <span class="led"></span>
+        </div>
+        <div class="inv-slot empty">
+          <span class="role">Factory</span>
+          <span class="host">public git scrape</span>
+          <span class="led"></span>
+        </div>
+      </div>
+
+      <div class="main two-col" style="margin-top: 28px">
+        <div class="stack" style="gap: 22px; padding-top: 8px">
+          <div>
+            <p class="eyebrow">Open standard · every harness</p>
+            <h1 class="display">Catalog skills.<br /><em>Install anywhere.</em></h1>
+          </div>
+          <p class="lede">
+            Self-hosted Agent Skills plane: search a gallery, audit packages, materialize
+            SKILL.md trees into Claude, OpenCode, Cursor, Codex, and portable .agents paths.
+          </p>
+          <div class="tag-row">
+            <span class="tag hot">search → audit → install</span>
+            <span class="tag vault">agentskills.io</span>
+            <span class="tag">confirm required</span>
+            <span class="tag">no script exec</span>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="title">Harness · after install</span>
+              <span class="title" style="color: var(--phosphor)">filesystem</span>
+            </div>
+            <div class="panel-body codeblock" style="border: none; padding: 4px 0; background: transparent">
+<span class="c"># portable default — works across clients</span>
+~/.agents/skills/hello-skill/SKILL.md
+~/.config/opencode/skills/…   <span class="c"># optional target</span>
+~/.claude/skills/…            <span class="c"># optional target</span>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <span class="title">Agent session</span>
+              <span class="title">MCP stdio</span>
+            </div>
+            <div class="panel-body chat">
+              <div class="bubble user">Install a skill for conventional commits</div>
+              <div class="bubble agent">
+                <span class="tool">sf_search_skills → git-commit-helper</span>
+                <span class="tool">sf_audit_skill → risk:low · no scripts</span>
+                <span class="tool">sf_install_skill(confirm=true) → ~/.agents/skills/…</span>
+                <span class="ok">ok · harness discovers SKILL.md next session</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="frame-foot">
+        <span>Campaign · Hero</span>
+        <span>Skills teach agents how — harnesses just find the files</span>
+      </footer>
+    </div>
+  </body>
+</html>

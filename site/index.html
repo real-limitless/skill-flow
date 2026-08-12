@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>skill-flow — Catalog skills. Install anywhere.</title>
+    <meta
+      name="description"
+      content="Self-hosted Agent Skills catalog + MCP install plane. Search, audit, and install SKILL.md packages into Claude, OpenCode, Cursor, Codex, and more."
+    />
+    <meta property="og:title" content="skill-flow — Catalog skills. Install anywhere." />
+    <meta
+      property="og:description"
+      content="search → audit → install. One plane for every harness that speaks agentskills.io."
+    />
+    <meta
+      property="og:image"
+      content="https://raw.githubusercontent.com/real-limitless/skill-flow/main/docs/images/campaign-hero.png"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/config.js"></script>
+  </head>
+  <body data-page="home">
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" data-site-href="/" href="./">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </a>
+        <div class="meta-pills">
+          <a class="pill" data-site-href="/why.html" href="why.html">Why</a>
+          <a class="pill" data-site-href="/how.html" href="how.html">How</a>
+          <a class="pill accent" data-site-href="/catalog.html" href="catalog.html">Catalog</a>
+          <a class="pill" data-site-href="/start.html" href="start.html">Start</a>
+          <a class="pill" data-repo href="https://github.com/real-limitless/skill-flow">GitHub</a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">Agent Skills · open standard · every harness</p>
+        <h1 class="display">Catalog skills.<br /><em>Install anywhere.</em></h1>
+        <p class="lede">
+          Self-hosted plane for <strong>Agent Skills</strong> (<span class="mono">SKILL.md</span>).
+          Search a gallery, audit packages, materialize into OpenCode, Claude Code, Cursor, Codex,
+          and portable <span class="mono">.agents/skills</span>.
+        </p>
+        <div class="tag-row">
+          <span class="tag hot">search → audit → install</span>
+          <span class="tag vault">agentskills.io</span>
+          <span class="tag">confirm required</span>
+          <span class="tag">Apache-2.0</span>
+        </div>
+        <p style="margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px">
+          <a class="pill accent" data-site-href="/catalog.html" href="catalog.html">Browse catalog</a>
+          <a class="pill on" data-site-href="/start.html" href="start.html">Quickstart</a>
+          <a class="pill" data-repo href="https://github.com/real-limitless/skill-flow">GitHub</a>
+        </p>
+      </section>
+
+      <div class="panel" style="margin-bottom: 28px; overflow: hidden">
+        <img
+          src="../docs/images/campaign-hero.png"
+          alt="skill-flow campaign hero"
+          style="width: 100%; display: block; max-height: 420px; object-fit: cover; object-position: top"
+          onerror="this.style.display='none'"
+          id="hero-img"
+        />
+      </div>
+
+      <div class="grid-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 40px">
+        <a class="panel" data-site-href="/why.html" href="why.html" style="padding: 18px; text-decoration: none; color: inherit; display: block">
+          <div class="mono" style="font-size: 11px; color: var(--accent-hot); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px">Why</div>
+          <h3 style="font-family: var(--font-display); margin-bottom: 8px">Stop skill sprawl</h3>
+          <p style="color: var(--mute); font-size: 14px; line-height: 1.45">One library, many harness paths. Audit before install.</p>
+        </a>
+        <a class="panel" data-site-href="/how.html" href="how.html" style="padding: 18px; text-decoration: none; color: inherit; display: block">
+          <div class="mono" style="font-size: 11px; color: var(--phosphor); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px">How</div>
+          <h3 style="font-family: var(--font-display); margin-bottom: 8px">Agent ritual</h3>
+          <p style="color: var(--mute); font-size: 14px; line-height: 1.45">MCP tools: search → show → audit → install(confirm).</p>
+        </a>
+        <a class="panel" data-site-href="/start.html" href="start.html" style="padding: 18px; text-decoration: none; color: inherit; display: block">
+          <div class="mono" style="font-size: 11px; color: var(--vault-hot); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px">Start</div>
+          <h3 style="font-family: var(--font-display); margin-bottom: 8px">CLI in minutes</h3>
+          <p style="color: var(--mute); font-size: 14px; line-height: 1.45">Seed catalog, install portable, wire MCP stdio.</p>
+        </a>
+      </div>
+
+      <section class="panel" style="margin-bottom: 48px">
+        <div class="panel-head">
+          <span class="title">Family</span>
+          <span class="title" style="color: var(--mute)">real-limitless</span>
+        </div>
+        <div class="panel-pad" style="padding: 16px 18px; color: var(--mute); font-size: 14px; line-height: 1.6">
+          <strong style="color: var(--ink)">mcp-flow</strong> — MCP servers &amp; sealed keys ·
+          <strong style="color: var(--ink)">ansible-flow-mcp</strong> — Ansible modules ·
+          <strong style="color: var(--phosphor)">skill-flow</strong> — Agent Skills install plane
+        </div>
+      </section>
+
+      <footer style="padding: 24px 0 48px; color: var(--dim); font-size: 13px; font-family: var(--font-mono)">
+        skill-flow · Apache-2.0 · not affiliated with Anthropic beyond the open Agent Skills format
+      </footer>
+    </div>
+    <script type="module" src="assets/site.js"></script>
+    <script>
+      // Prefer images from site/out after build
+      const img = document.getElementById("hero-img");
+      if (img) {
+        img.src = "assets/campaign-hero.png";
+        img.onerror = () => {
+          img.src = "../docs/images/campaign-hero.png";
+        };
+      }
+    </script>
+  </body>
+</html>

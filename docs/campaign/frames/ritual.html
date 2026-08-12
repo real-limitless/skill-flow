@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ritual — skill-flow</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body class="frame-body">
+    <div class="canvas" id="frame">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </div>
+        <div class="meta-pills">
+          <span class="pill accent">Agent ritual</span>
+          <span class="pill on">MCP tools</span>
+        </div>
+      </header>
+
+      <div class="main" style="margin-top: 16px">
+        <p class="eyebrow">How agents install safely</p>
+        <h2 class="section-title" style="margin-bottom: 12px">search → show → audit → install</h2>
+        <p class="lede" style="margin-bottom: 24px; max-width: 52ch">
+          Same discipline as ansible-flow’s check-first loop. The model never gets a silent
+          write path — <span class="mono">confirm=true</span> is required.
+        </p>
+
+        <div class="topo" style="margin-bottom: 20px">
+          <div class="topo-row">
+            <div class="topo-chip">sf_search_skills</div>
+            <div class="topo-chip">sf_show_skill</div>
+            <div class="topo-chip">sf_audit_skill</div>
+            <div class="topo-chip">sf_install_skill</div>
+          </div>
+        </div>
+
+        <div class="main two-col" style="padding: 0; gap: 16px">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="title">Audit report</span>
+              <span class="title" style="color: var(--phosphor)">static</span>
+            </div>
+            <div class="panel-body codeblock" style="border: none; background: transparent; padding: 8px 0">
+{
+  <span class="k">"risk"</span>: <span class="s">"low"</span>,
+  <span class="k">"hasScripts"</span>: false,
+  <span class="k">"flags"</span>: [],
+  <span class="k">"externalUrls"</span>: []
+}
+<span class="c"># high risk → warn, still needs confirm</span>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <span class="title">Install result</span>
+              <span class="title">portable</span>
+            </div>
+            <div class="panel-body chat">
+              <div class="bubble agent">
+                <span class="tool">target: portable · scope: user</span>
+                <span class="tool">~/.agents/skills/git-commit-helper/</span>
+                <span class="ok">materialized · harness discovers next session</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="frame-foot">
+        <span>Campaign · Ritual</span>
+        <span>Never execute skill scripts during install</span>
+      </footer>
+    </div>
+  </body>
+</html>

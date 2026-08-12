@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Start — skill-flow</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/config.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" data-site-href="/" href="./">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </a>
+        <div class="meta-pills">
+          <a class="pill" href="why.html">Why</a>
+          <a class="pill" href="how.html">How</a>
+          <a class="pill" href="catalog.html">Catalog</a>
+          <a class="pill accent" href="start.html">Start</a>
+          <a class="pill" data-repo href="https://github.com/real-limitless/skill-flow">GitHub</a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">Quickstart</p>
+        <h1 class="display" style="font-size: 42px">Run skill-flow locally</h1>
+        <p class="lede">Node.js ≥ 22. Git on PATH for remote installs.</p>
+      </section>
+
+      <div class="panel" style="margin-bottom: 16px">
+        <div class="panel-head"><span class="title">Install &amp; seed</span></div>
+        <pre class="code-block" style="margin: 0; border: none">git clone https://github.com/real-limitless/skill-flow.git
+cd skill-flow
+npm install && npm run build
+npm run catalog:seed
+
+npx skill-flow doctor
+npx skill-flow catalog search commit
+npx skill-flow install seed:hello-skill --target portable --yes
+npx skill-flow serve</pre>
+      </div>
+
+      <div class="panel" style="margin-bottom: 48px">
+        <div class="panel-head"><span class="title">MCP config snippet</span></div>
+        <pre class="code-block" style="margin: 0; border: none">{
+  "mcpServers": {
+    "skill-flow": {
+      "command": "npx",
+      "args": ["skill-flow", "serve"]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+    <script type="module" src="assets/site.js"></script>
+  </body>
+</html>

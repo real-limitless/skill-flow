@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Why — skill-flow</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/config.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" data-site-href="/" href="./">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </a>
+        <div class="meta-pills">
+          <a class="pill accent" href="why.html">Why</a>
+          <a class="pill" href="how.html">How</a>
+          <a class="pill" href="catalog.html">Catalog</a>
+          <a class="pill" href="start.html">Start</a>
+          <a class="pill" data-repo href="https://github.com/real-limitless/skill-flow">GitHub</a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">The failure mode we refuse</p>
+        <h1 class="display" style="font-size: 42px; max-width: 18ch">Expertise trapped in zip files and tribal paths.</h1>
+        <p class="lede">
+          Every harness wants <span class="mono">SKILL.md</span> somewhere different. Teams paste skills by hand,
+          skip audits, and lose track of what agents can load.
+        </p>
+      </section>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px" class="compare-grid">
+        <div class="panel" style="padding: 20px; border-top: 3px solid var(--deny)">
+          <h3 class="mono" style="color: var(--deny); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px">Without skill-flow</h3>
+          <ul style="list-style: none; color: var(--mute); font-size: 14px; line-height: 1.55; display: flex; flex-direction: column; gap: 10px">
+            <li>Manual drag-drop into one client only</li>
+            <li>No shared gallery across the team</li>
+            <li>Unvetted scripts inside “helpful” skills</li>
+            <li>OpenCode / Cursor / Codex never share a library</li>
+          </ul>
+        </div>
+        <div class="panel" style="padding: 20px; border-top: 3px solid var(--phosphor)">
+          <h3 class="mono" style="color: var(--phosphor); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px">With skill-flow</h3>
+          <ul style="list-style: none; color: var(--mute); font-size: 14px; line-height: 1.55; display: flex; flex-direction: column; gap: 10px">
+            <li>Search → show → audit → install</li>
+            <li>Adapters for native harness paths</li>
+            <li>Portable <span class="mono">.agents/skills</span> default</li>
+            <li>Confirm required; scripts never run by the plane</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="status-line" style="margin-bottom: 48px">
+        Skills teach agents <em>how</em>. MCP connects agents to <em>things</em>. skill-flow is the install plane for skills.
+      </p>
+    </div>
+    <script type="module" src="assets/site.js"></script>
+    <style>
+      @media (max-width: 720px) {
+        .compare-grid { grid-template-columns: 1fr !important; }
+      }
+    </style>
+  </body>
+</html>

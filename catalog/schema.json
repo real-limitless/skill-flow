@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/real-limitless/skill-flow/catalog/schema.json",
+  "title": "SkillGalleryEntry",
+  "description": "Normalized Agent Skills gallery entry. schemaVersion 1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "description",
+    "status",
+    "provenance",
+    "source",
+    "package",
+    "skillMd",
+    "categories",
+    "tags"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "title": { "type": "string" },
+    "description": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string" },
+    "license": { "type": "string" },
+    "compatibility": { "type": "string" },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "allowedTools": { "type": "string" },
+    "categories": { "type": "array", "items": { "type": "string" } },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "inactive", "unknown"]
+    },
+    "provenance": {
+      "type": "string",
+      "enum": ["factory", "manual", "seed"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "url", "skillPath"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["github", "gitlab", "url", "local"]
+        },
+        "url": { "type": "string" },
+        "ref": { "type": "string" },
+        "subpath": { "type": "string" },
+        "skillPath": { "type": "string" }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": { "type": "string" },
+        "host": { "type": "string" },
+        "stars": { "type": "number" },
+        "defaultBranch": { "type": "string" }
+      }
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["git-subtree", "tarball", "zip", "local-path"]
+        },
+        "url": { "type": "string" },
+        "localPath": { "type": "string" },
+        "sha256": { "type": "string" },
+        "sizeBytes": { "type": "number" },
+        "files": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "skillMd": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frontmatter"],
+      "properties": {
+        "frontmatter": { "type": "object" },
+        "bodyPreview": { "type": "string" },
+        "lineCount": { "type": "number" }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk", "flags"],
+      "properties": {
+        "risk": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "unknown"]
+        },
+        "flags": { "type": "array", "items": { "type": "string" } },
+        "auditedAt": { "type": "string" }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stars": { "type": "number" },
+        "forks": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "readme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "markdown": { "type": "string" },
+        "source": { "type": "string" },
+        "fetchedAt": { "type": "string" }
+      }
+    },
+    "publishedAt": { "type": "string" },
+    "updatedAt": { "type": "string" },
+    "fetchedAt": { "type": "string" }
+  }
+}

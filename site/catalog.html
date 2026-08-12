@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Catalog — skill-flow</title>
+    <meta name="description" content="Browse Agent Skills in the skill-flow gallery." />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/config.js"></script>
+  </head>
+  <body data-page="catalog">
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" data-site-href="/" href="./">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-name">skill<span>-flow</span></div>
+        </a>
+        <div class="meta-pills">
+          <a class="pill" href="why.html">Why</a>
+          <a class="pill" href="how.html">How</a>
+          <a class="pill accent" href="catalog.html">Catalog</a>
+          <a class="pill" href="start.html">Start</a>
+          <a class="pill" data-repo href="https://github.com/real-limitless/skill-flow">GitHub</a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">Gallery · seed + factory</p>
+        <h1 class="display" style="font-size: 42px">Browse skills.<br /><em>Install into the plane.</em></h1>
+        <p class="lede">
+          Public metadata and audit flags. Wire installs through CLI or MCP —
+          harnesses only see filesystem skills after materialize.
+        </p>
+        <p class="status-line" id="status">Loading catalog…</p>
+      </section>
+
+      <div class="search-panel panel" style="margin-bottom: 20px">
+        <div class="panel-head">
+          <span class="title">Search · filters</span>
+        </div>
+        <div class="panel-pad search-inner" style="padding: 16px">
+          <label class="field-label" for="q" style="display: block; font-family: var(--font-mono); font-size: 11px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px">Query</label>
+          <input
+            type="search"
+            id="q"
+            placeholder="name, tags, description…"
+            autocomplete="off"
+            style="width: 100%; padding: 12px 14px; background: var(--panel-2); border: 1px solid var(--rail); color: var(--ink); font-family: var(--font-body); font-size: 15px; margin-bottom: 12px"
+          />
+          <label class="filter-field" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mute)">
+            <span>Risk</span>
+            <select id="f-risk" style="background: var(--panel-2); border: 1px solid var(--rail); color: var(--ink); padding: 6px 10px">
+              <option value="">Any</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="skill-list" class="skill-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 48px"></div>
+    </div>
+    <script type="module" src="assets/site.js"></script>
+    <style>
+      .row-card {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding: 16px 18px;
+        border: 1px solid var(--rail);
+        background: var(--panel);
+        text-decoration: none;
+        color: inherit;
+      }
+      .row-card:hover {
+        border-color: var(--accent);
+      }
+      .row-title {
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .row-sub {
+        font-size: 12px;
+        color: var(--dim);
+        margin-top: 4px;
+      }
+      .row-desc {
+        font-size: 14px;
+        color: var(--mute);
+        margin-top: 8px;
+        max-width: 62ch;
+        line-height: 1.45;
+      }
+      .row-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-content: flex-start;
+      }
+      .badge {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border: 1px solid var(--rail);
+        color: var(--mute);
+      }
+      .badge.on {
+        color: var(--phosphor);
+        border-color: rgba(62, 207, 142, 0.35);
+      }
+      .badge.warn {
+        color: var(--warn);
+        border-color: rgba(224, 180, 74, 0.4);
+      }
+      .badge.deny {
+        color: var(--deny);
+        border-color: rgba(240, 113, 120, 0.4);
+      }
+      .badge.place {
+        color: var(--accent-hot);
+        border-color: rgba(45, 212, 191, 0.35);
+      }
+    </style>
+  </body>
+</html>

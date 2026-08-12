@@ -1,0 +1,25 @@
+node_modules/
+dist/
+build/
+data/
+*.db
+*.db-wal
+*.db-shm
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+coverage/
+*.tsbuildinfo
+scripts/factory/.jobs/
+# Sharded catalog data (can be huge); schema/blocklist/seed stay tracked
+catalog/entries/
+catalog/index.json
+catalog/meta.json
+catalog/browse/
+site/out/
+.skill-flow-test/
