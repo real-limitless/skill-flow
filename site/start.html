@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Start — skill-flow</title>
+    <title>Start: skill-flow</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/styles.css" />
     <script src="assets/config.js"></script>
   </head>
@@ -26,7 +27,7 @@
       <section class="hero">
         <p class="eyebrow">Quickstart</p>
         <h1 class="display" style="font-size: 42px">Run skill-flow locally</h1>
-        <p class="lede">Node.js ≥ 22. Git on PATH for remote installs.</p>
+        <p class="lede">Node.js ≥ 22. Git on PATH for remote installs. Use the scoped package — unscoped <span class="mono">npx skill-flow</span> is a different CLI on npm.</p>
       </section>
 
       <div class="panel" style="margin-bottom: 16px">
@@ -36,10 +37,10 @@ cd skill-flow
 npm install && npm run build
 npm run catalog:seed
 
-npx skill-flow doctor
-npx skill-flow catalog search commit
-npx skill-flow install seed:hello-skill --target portable --yes
-npx skill-flow serve</pre>
+npx @real-limitless/skill-flow doctor
+npx @real-limitless/skill-flow catalog search commit
+npx @real-limitless/skill-flow install seed:hello-skill --target portable --yes
+npx @real-limitless/skill-flow serve</pre>
       </div>
 
       <div class="panel" style="margin-bottom: 48px">
@@ -48,7 +49,7 @@ npx skill-flow serve</pre>
   "mcpServers": {
     "skill-flow": {
       "command": "npx",
-      "args": ["skill-flow", "serve"]
+      "args": ["@real-limitless/skill-flow", "serve"]
     }
   }
 }</pre>

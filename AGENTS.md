@@ -1,4 +1,4 @@
-# skill-flow — agent guide
+# skill-flow: agent guide
 
 Self-hosted **Agent Skills catalog + install plane**. TypeScript / Node ≥ 22. MCP stdio + CLI.
 
@@ -18,7 +18,7 @@ Sibling: mcp-flow (MCP servers), ansible-flow-mcp (Ansible).
 1. Never commit secrets or `.env`.
 2. Catalog never stores secret values.
 3. Schema bumps → `catalog/schema.json` + `CATALOG_SCHEMA_VERSION` in `src/catalog/constants.ts`.
-4. Do not scrape competitor marketplaces (e.g. mcpmarket) as catalog SoT — public git + seeds only.
+4. Do not scrape competitor marketplaces (e.g. mcpmarket) as catalog SoT: public git + seeds only.
 5. Do not commit `catalog/entries/`, `index.json`, `meta.json` (gitignored) unless explicitly asked.
 6. Install must require confirm; never execute skill scripts on install.
 7. No force-push `main`; commit only when user asks.
@@ -59,7 +59,7 @@ npm run catalog:seed
 npm run catalog:validate
 npm run campaign:capture   # playwright → docs/images
 npm run site:build
-npx skill-flow doctor
+npx @real-limitless/skill-flow doctor
 ```
 
 ## Ritual

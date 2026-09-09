@@ -19,7 +19,7 @@ Sibling to [mcp-flow](https://github.com/real-limitless/mcp-flow) (MCP servers) 
 | **Why it exists** | **Agent ritual** |
 | ![Why: skill sprawl vs install plane](docs/images/campaign-why.png) | ![Ritual: search → audit → install](docs/images/campaign-ritual.png) |
 | **Harness adapters** | **Operators** |
-| ![Harness path matrix](docs/images/campaign-harness.png) | ![CLI, catalog, dual-track](docs/images/campaign-operator.png) |
+| ![Harness path matrix](docs/images/campaign-harness.png) | ![CLI, catalog, gallery](docs/images/campaign-operator.png) |
 
 Re-shoot: `npm run campaign:capture` (from `docs/campaign/capture.sh`).
 
@@ -33,13 +33,25 @@ Skills package expertise as folders. Every harness discovers them from slightly 
 search → show → audit → install(confirm) → list_installed
 ```
 
-Harnesses only see normal filesystem skills after install — no proprietary runtime lock-in.
+Harnesses only see normal filesystem skills after install: no proprietary runtime lock-in.
 
 ![Without a plane vs skill-flow](docs/images/campaign-why.png)
 
 ---
 
 ## Quickstart
+
+```bash
+git clone -b DEVELOPMENT https://github.com/real-limitless/skill-flow.git
+cd skill-flow
+docker compose up -d --build
+# health: http://127.0.0.1:8788/health
+npx @real-limitless/skill-flow doctor
+```
+
+The container listens on **8788**. MCP stdio is still `npx @real-limitless/skill-flow serve` (or `docker compose exec skill-flow node dist/cli.js serve`). Unscoped `npx skill-flow` is a **different** npm package.
+
+Host Node (contributors):
 
 Requirements: **Node.js ≥ 22**, `git` on PATH (for remote installs).
 
@@ -48,17 +60,17 @@ npm install
 npm run build
 npm run catalog:seed
 
-npx skill-flow doctor
-npx skill-flow catalog search commit
-npx skill-flow audit seed:hello-skill
-npx skill-flow install seed:hello-skill --target portable --yes
-npx skill-flow list
+npx @real-limitless/skill-flow doctor
+npx @real-limitless/skill-flow catalog search commit
+npx @real-limitless/skill-flow audit seed:hello-skill
+npx @real-limitless/skill-flow install seed:hello-skill --target portable --yes
+npx @real-limitless/skill-flow list
 ```
 
 ### MCP (stdio)
 
 ```bash
-npx skill-flow serve
+npx @real-limitless/skill-flow serve
 ```
 
 OpenCode / Cursor-style config:
@@ -68,7 +80,7 @@ OpenCode / Cursor-style config:
   "mcpServers": {
     "skill-flow": {
       "command": "npx",
-      "args": ["skill-flow", "serve"]
+      "args": ["@real-limitless/skill-flow", "serve"]
     }
   }
 }
@@ -93,8 +105,10 @@ Or point at a local build:
 | --- | --- |
 | `sf_search_skills` | Catalog search |
 | `sf_show_skill` | Full gallery entry |
+| `sf_get_skill_file` | Preview a file in a skill tree |
 | `sf_audit_skill` | Static risk heuristics |
 | `sf_install_skill` | Write skill tree (`confirm: true`) |
+| `sf_uninstall_skill` | Remove an installed skill |
 | `sf_list_installed` | Scan harness roots |
 | `sf_list_harnesses` | Adapter matrix + detect |
 | `sf_status` | Health |
@@ -115,10 +129,13 @@ Or point at a local build:
 Scope: `--scope user|project`.
 
 ```bash
-npx skill-flow install ./my-skill --target harness:opencode --scope user --yes
-npx skill-flow install https://github.com/org/repo --yes
-npx skill-flow uninstall hello-skill --target portable
+npx @real-limitless/skill-flow install ./my-skill --target harness:opencode --scope user --yes
+npx @real-limitless/skill-flow install https://github.com/org/skill-repo --yes
+npx @real-limitless/skill-flow install https://github.com/org/monorepo --subpath packages/my-skill --yes
+npx @real-limitless/skill-flow uninstall hello-skill --target portable
 ```
+
+Git URLs must be a **skill package** (one `SKILL.md`). This product repo is not a skill; use `--subpath catalog/seed/hello-skill` if you clone it anyway. Multiple `SKILL.md` files fail until you pass `--subpath`.
 
 ---
 
@@ -172,7 +189,7 @@ Live (after Pages enable): https://real-limitless.github.io/skill-flow/
 
 ## Status
 
-**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next — see [PLAN.md](./PLAN.md).
+**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next: see [PLAN.md](./PLAN.md).
 
 ---
 

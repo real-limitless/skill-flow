@@ -125,6 +125,17 @@ a:hover {
   align-items: center;
 }
 
+@media (max-width: 640px) {
+  .meta-pills {
+    gap: 6px;
+  }
+  .pill {
+    font-size: 10px;
+    padding: 5px 8px;
+    letter-spacing: 0.04em;
+  }
+}
+
 .pill {
   font-family: var(--font-mono);
   font-size: 11px;

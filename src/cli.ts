@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { readFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir } from "node:fs/promises";
 import { auditPackage } from "./audit/scan.js";
 import {
   loadIndex,
@@ -9,7 +8,7 @@ import {
   readEntry,
   rebuildIndex,
   searchIndex,
-  writeEntry,
+  addEntry,
 } from "./catalog/shard.js";
 import { entryFromLocalPackage } from "./catalog/from-package.js";
 import {
@@ -21,12 +20,8 @@ import { detectHarnesses, HARNESS_REGISTRY } from "./harness/registry.js";
 import { loadLocalSkill } from "./package/load-local.js";
 import { resolveSkillSource } from "./package/resolve-source.js";
 import { runStdioServer } from "./mcp/server.js";
-import {
-  defaultCatalogDir,
-  packageRoot,
-  projectRoot,
-  skillFlowHome,
-} from "./paths.js";
+import { doctorReport, startHealthServer } from "./health.js";
+import { defaultCatalogDir, skillFlowHome } from "./paths.js";
 import type { InstallScope } from "./types.js";
 
 const VERSION = "0.1.0";
@@ -50,9 +45,17 @@ async function main() {
 
   program
     .command("serve")
-    .description("Run MCP server (stdio)")
+    .description("Run MCP server (stdio) or HTTP health")
     .option("--catalog <dir>", "catalog directory", defaultCatalogDir())
-    .action(async (opts: { catalog: string }) => {
+    .option("--http", "HTTP health listener (family port 8788)")
+    .option("--host <host>", "HTTP bind host", process.env.SKILL_FLOW_HOST || "0.0.0.0")
+    .option("-p, --port <port>", "HTTP port", process.env.SKILL_FLOW_PORT || "8788")
+    .action(async (opts: { catalog: string; http?: boolean; host: string; port: string }) => {
+      if (opts.http) {
+        process.env.SKILL_FLOW_PORT = String(opts.port);
+        await startHealthServer({ host: opts.host, port: Number(opts.port) });
+        return;
+      }
       await runStdioServer({ catalogDir: opts.catalog });
     });
 
@@ -60,25 +63,7 @@ async function main() {
     .command("doctor")
     .description("Environment + catalog health")
     .action(async () => {
-      const catalogDir = defaultCatalogDir();
-      let meta: unknown = null;
-      try {
-        meta = JSON.parse(await readFile(join(catalogDir, "meta.json"), "utf8"));
-      } catch {
-        meta = null;
-      }
-      const harnesses = await detectHarnesses();
-      printJson({
-        ok: true,
-        version: VERSION,
-        packageRoot: packageRoot(),
-        skillFlowHome: skillFlowHome(),
-        catalogDir,
-        catalogMeta: meta,
-        projectRoot: projectRoot(),
-        harnessesPresent: harnesses.filter((h) => h.present).map((h) => h.id),
-        node: process.version,
-      });
+      printJson(await doctorReport());
     });
 
   program
@@ -150,6 +135,7 @@ async function main() {
     .argument("<path>")
     .option("--catalog <dir>", "catalog dir", defaultCatalogDir())
     .option("--id <id>", "stable id override")
+    .option("--force", "overwrite existing id", false)
     .option("--tag <tag>", "tag (repeatable)", (v, acc: string[]) => {
       acc.push(v);
       return acc;
@@ -157,7 +143,7 @@ async function main() {
     .action(
       async (
         path: string,
-        opts: { catalog: string; id?: string; tag: string[] },
+        opts: { catalog: string; id?: string; tag: string[]; force?: boolean },
       ) => {
         const pkg = await loadLocalSkill(path);
         const entry = await entryFromLocalPackage(pkg, {
@@ -165,7 +151,7 @@ async function main() {
           provenance: "manual",
           tags: opts.tag,
         });
-        await writeEntry(opts.catalog, entry);
+        await addEntry(opts.catalog, entry, { force: Boolean(opts.force) });
         await rebuildIndex(opts.catalog);
         printJson({ wrote: entry.id, name: entry.name });
       },
@@ -197,6 +183,7 @@ async function main() {
     .option("-y, --yes", "confirm install", false)
     .option("--project <dir>", "project root for project scope")
     .option("--path <dir>", "generic install parent directory")
+    .option("--subpath <dir>", "subdirectory in a git clone that contains SKILL.md")
     .option("--catalog <dir>", "catalog dir", defaultCatalogDir())
     .action(
       async (
@@ -209,6 +196,7 @@ async function main() {
           yes?: boolean;
           project?: string;
           path?: string;
+          subpath?: string;
           catalog: string;
         },
       ) => {
@@ -222,6 +210,7 @@ async function main() {
             confirm: Boolean(opts.yes),
             projectRoot: opts.project,
             genericPath: opts.path,
+            subpath: opts.subpath,
           },
           { catalogLookup: catalogLookup(opts.catalog) },
         );
@@ -275,9 +264,11 @@ async function main() {
     .command("audit")
     .argument("<source>")
     .option("--catalog <dir>", "catalog dir", defaultCatalogDir())
-    .action(async (source: string, opts: { catalog: string }) => {
+    .option("--subpath <dir>", "subdirectory in a git clone that contains SKILL.md")
+    .action(async (source: string, opts: { catalog: string; subpath?: string }) => {
       const { pkg, resolvedFrom } = await resolveSkillSource(source, {
         catalogLookup: catalogLookup(opts.catalog),
+        subpath: opts.subpath,
       });
       const audit = await auditPackage(pkg);
       printJson({
@@ -292,7 +283,9 @@ async function main() {
   // ensure home exists for state
   await mkdir(skillFlowHome(), { recursive: true }).catch(() => undefined);
 
+  const keepAlive = process.argv.slice(2)[0] === "serve";
   await program.parseAsync(process.argv);
+  if (!keepAlive) process.exit(process.exitCode ?? 0);
 }
 
 main().catch((err) => {

@@ -189,7 +189,7 @@ export async function detectHarnesses(opts: {
       out.push({
         id: h.id,
         displayName: h.displayName,
-        present: h.installMode === "zip",
+        present: false,
         installMode: h.installMode,
         notes: h.notes,
       });

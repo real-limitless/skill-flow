@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>skill-flow — Catalog skills. Install anywhere.</title>
+    <title>skill-flow: Catalog skills. Install anywhere.</title>
     <meta
       name="description"
       content="Self-hosted Agent Skills catalog + MCP install plane. Search, audit, and install SKILL.md packages into Claude, OpenCode, Cursor, Codex, and more."
     />
-    <meta property="og:title" content="skill-flow — Catalog skills. Install anywhere." />
+    <meta property="og:title" content="skill-flow: Catalog skills. Install anywhere." />
     <meta
       property="og:description"
       content="search → audit → install. One plane for every harness that speaks agentskills.io."
@@ -17,6 +17,7 @@
       property="og:image"
       content="https://raw.githubusercontent.com/real-limitless/skill-flow/main/docs/images/campaign-hero.png"
     />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/styles.css" />
     <script src="assets/config.js"></script>
   </head>
@@ -59,11 +60,9 @@
 
       <div class="panel" style="margin-bottom: 28px; overflow: hidden">
         <img
-          src="../docs/images/campaign-hero.png"
+          src="assets/campaign-hero.png"
           alt="skill-flow campaign hero"
           style="width: 100%; display: block; max-height: 420px; object-fit: cover; object-position: top"
-          onerror="this.style.display='none'"
-          id="hero-img"
         />
       </div>
 
@@ -91,9 +90,9 @@
           <span class="title" style="color: var(--mute)">real-limitless</span>
         </div>
         <div class="panel-pad" style="padding: 16px 18px; color: var(--mute); font-size: 14px; line-height: 1.6">
-          <strong style="color: var(--ink)">mcp-flow</strong> — MCP servers &amp; sealed keys ·
-          <strong style="color: var(--ink)">ansible-flow-mcp</strong> — Ansible modules ·
-          <strong style="color: var(--phosphor)">skill-flow</strong> — Agent Skills install plane
+          <strong style="color: var(--ink)">mcp-flow</strong>: MCP servers &amp; sealed keys ·
+          <strong style="color: var(--ink)">ansible-flow-mcp</strong>: Ansible modules ·
+          <strong style="color: var(--phosphor)">skill-flow</strong>: Agent Skills install plane
         </div>
       </section>
 
@@ -102,15 +101,5 @@
       </footer>
     </div>
     <script type="module" src="assets/site.js"></script>
-    <script>
-      // Prefer images from site/out after build
-      const img = document.getElementById("hero-img");
-      if (img) {
-        img.src = "assets/campaign-hero.png";
-        img.onerror = () => {
-          img.src = "../docs/images/campaign-hero.png";
-        };
-      }
-    </script>
   </body>
 </html>
