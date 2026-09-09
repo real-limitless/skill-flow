@@ -16,8 +16,8 @@ cd docs/campaign && ./capture.sh
 
 ## Story
 
-1. **Hero** — one install plane for every harness  
-2. **Why** — stop hand-copying SKILL.md trees  
-3. **Ritual** — search → audit → install  
-4. **Harness** — path adapters across agentskills.io clients  
-5. **Operator** — CLI, catalog, factory roadmap  
+1. **Hero**: one install plane for every harness  
+2. **Why**: stop hand-copying SKILL.md trees  
+3. **Ritual**: search → audit → install  
+4. **Harness**: path adapters across agentskills.io clients  
+5. **Operator**. CLI, catalog, factory roadmap  
