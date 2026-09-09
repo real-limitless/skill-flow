@@ -2,15 +2,13 @@
 
 **One plane to catalog, audit, and install Agent Skills into every harness.**
 
-Self-hosted **skills catalog + MCP install plane** for the [Agent Skills](https://agentskills.io) open standard (`SKILL.md`). Search a gallery, audit packages, then materialize skills into OpenCode, Claude Code, Cursor, Codex, portable `.agents/skills`, and more.
+This branch (`CORE`) is documentation only. The runnable catalog and install plane live on [`DEVELOPMENT`](https://github.com/real-limitless/skill-flow/tree/DEVELOPMENT). `main` stays a product alias.
 
-![Hero: catalog skills, install anywhere](docs/images/campaign-hero.png)
-
-Sibling to [mcp-flow](https://github.com/real-limitless/mcp-flow) (MCP servers) and [ansible-flow-mcp](https://github.com/real-limitless/ansible-flow-mcp) (Ansible).
-
-[Marketing site](site/) · [PLAN.md](./PLAN.md) · [Campaign](docs/campaign/) · Apache-2.0
-
----
+| | |
+|---|---|
+| **License** | [Apache-2.0](LICENSE) |
+| **Install / code** | [`DEVELOPMENT`](https://github.com/real-limitless/skill-flow/tree/DEVELOPMENT) |
+| **Marketing site** | [site/](site/) |
 
 ## Visual tour
 
