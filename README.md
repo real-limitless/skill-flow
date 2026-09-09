@@ -9,6 +9,9 @@ This branch (`CORE`) is documentation only. The runnable catalog and install pla
 | **License** | [Apache-2.0](LICENSE) |
 | **Install / code** | [`DEVELOPMENT`](https://github.com/real-limitless/skill-flow/tree/DEVELOPMENT) |
 | **Marketing site** | [site/](site/) |
+| **Branches** | [BRANCHES.md](BRANCHES.md) |
+| **Species** | [SPECIES.md](SPECIES.md) |
+| **Voice** | [VOICE.md](VOICE.md) |
 
 ## Visual tour
 
@@ -177,3 +180,13 @@ Live (after Pages enable): https://real-limitless.github.io/skill-flow/
 ## License
 
 Apache-2.0
+
+
+## Family
+
+Written standard: private TheFLOW.
+
+- mcp-flow: MCP servers and sealed keys
+- ansible-flow-mcp: Ansible modules
+- roster-flow: installs skills onto seats
+- OpenFlow, wiki-flow, CleanFlow, ProjectEverflow: siblings
