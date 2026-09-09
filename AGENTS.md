@@ -1,7 +1,9 @@
 # skill-flow: agent guide
 
-Self-hosted **Agent Skills catalog + install plane**. TypeScript / Node ≥ 22. MCP stdio + CLI.
+This checkout is the CORE branch: concept, campaign, and marketing site. No install-plane source.
 
+- Runnable CLI and MCP: branch DEVELOPMENT. Compose is the supported run path.
+- Do not add src/ or package.json here.
 ## What this is
 
 | Surface | Role |

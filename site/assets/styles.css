@@ -102,7 +102,7 @@ a:hover {
   height: 28px;
   background: linear-gradient(145deg, var(--accent-hot), var(--vault));
   clip-path: polygon(50% 0, 100% 35%, 82% 100%, 18% 100%, 0 35%);
-  box-shadow: 0 0 22px rgba(91, 141, 239, 0.4);
+  box-shadow: 0 0 22px rgba(45, 212, 191, 0.4);
   flex-shrink: 0;
 }
 
@@ -147,7 +147,7 @@ a:hover {
 }
 .pill.accent {
   color: var(--accent-hot);
-  border-color: rgba(91, 141, 239, 0.45);
+  border-color: rgba(45, 212, 191, 0.45);
 }
 .pill.vault {
   color: var(--vault-hot);
@@ -227,7 +227,7 @@ h2.section-title {
   background: rgba(16, 22, 31, 0.6);
 }
 .tag.hot {
-  border-color: rgba(91, 141, 239, 0.45);
+  border-color: rgba(45, 212, 191, 0.45);
   color: var(--accent-hot);
 }
 .tag.vault {
@@ -264,7 +264,7 @@ h2.section-title {
 #q:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(91, 141, 239, 0.35);
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.35);
 }
 
 .filter-bar {
@@ -328,7 +328,7 @@ h2.section-title {
 }
 .pill-btn:hover:not(:disabled) {
   color: var(--ink);
-  border-color: rgba(91, 141, 239, 0.45);
+  border-color: rgba(45, 212, 191, 0.45);
 }
 .pill-btn:disabled {
   opacity: 0.4;
@@ -340,7 +340,7 @@ h2.section-title {
 .pill-btn.on,
 .pill-btn[aria-expanded="true"] {
   color: var(--accent-hot);
-  border-color: rgba(91, 141, 239, 0.45);
+  border-color: rgba(45, 212, 191, 0.45);
 }
 
 .seg {
@@ -365,7 +365,7 @@ h2.section-title {
 }
 .seg-btn.on {
   color: var(--accent-hot);
-  background: rgba(91, 141, 239, 0.14);
+  background: rgba(45, 212, 191, 0.14);
 }
 .seg-btn:hover {
   color: var(--ink);
@@ -435,7 +435,7 @@ tr.row-inactive .title-cell {
   transition: border-color 0.12s ease;
 }
 .server-card:hover {
-  border-color: rgba(91, 141, 239, 0.55);
+  border-color: rgba(45, 212, 191, 0.55);
 }
 .server-card.inactive {
   opacity: 0.72;
@@ -512,7 +512,7 @@ tr.row-inactive .title-cell {
   background: linear-gradient(
     90deg,
     var(--panel-2) 0%,
-    rgba(91, 141, 239, 0.08) 50%,
+    rgba(45, 212, 191, 0.08) 50%,
     var(--panel-2) 100%
   );
   background-size: 200% 100%;
@@ -594,7 +594,7 @@ tr.row-inactive .title-cell {
   cursor: pointer;
 }
 .data-table tr.row-link:hover td {
-  background: rgba(91, 141, 239, 0.06);
+  background: rgba(45, 212, 191, 0.06);
 }
 
 .data-table .slug {
@@ -639,7 +639,7 @@ tr.row-inactive .title-cell {
 }
 .badge.place {
   color: var(--accent-hot);
-  border-color: rgba(91, 141, 239, 0.35);
+  border-color: rgba(45, 212, 191, 0.35);
 }
 .badge.seal {
   color: var(--vault-hot);
@@ -760,14 +760,14 @@ tr.row-inactive .title-cell {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  border: 1px solid rgba(91, 141, 239, 0.45);
-  background: rgba(91, 141, 239, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  background: rgba(45, 212, 191, 0.12);
   color: var(--accent-hot);
   padding: 8px 12px;
   margin-top: 10px;
 }
 .btn:hover {
-  background: rgba(91, 141, 239, 0.2);
+  background: rgba(45, 212, 191, 0.2);
 }
 
 ul.docs {
