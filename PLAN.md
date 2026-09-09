@@ -1,8 +1,8 @@
-# [PLAN] skill-flow — Agent Skills catalog + install plane
+# [PLAN] skill-flow: Agent Skills catalog + install plane
 
 ## Summary
 
-**skill-flow** catalogs Agent Skills (`SKILL.md` packages), audits them, and installs them into harness-specific filesystem paths via CLI and MCP. Dual-track ready for a static gallery site and factory enrichment (mcp-flow patterns).
+**skill-flow** catalogs Agent Skills (`SKILL.md` packages), audits them, and installs them into harness-specific filesystem paths via CLI and MCP. Ready for a static gallery site and factory enrichment (mcp-flow patterns).
 
 ## Locked decisions
 
