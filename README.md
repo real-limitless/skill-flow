@@ -17,7 +17,7 @@ This branch (`CORE`) is documentation only. The runnable catalog and install pla
 | **Why it exists** | **Agent ritual** |
 | ![Why: skill sprawl vs install plane](docs/images/campaign-why.png) | ![Ritual: search → audit → install](docs/images/campaign-ritual.png) |
 | **Harness adapters** | **Operators** |
-| ![Harness path matrix](docs/images/campaign-harness.png) | ![CLI, catalog, dual-track](docs/images/campaign-operator.png) |
+| ![Harness path matrix](docs/images/campaign-harness.png) | ![CLI, catalog, gallery](docs/images/campaign-operator.png) |
 
 Re-shoot: `npm run campaign:capture` (from `docs/campaign/capture.sh`).
 
@@ -31,7 +31,7 @@ Skills package expertise as folders. Every harness discovers them from slightly 
 search → show → audit → install(confirm) → list_installed
 ```
 
-Harnesses only see normal filesystem skills after install — no proprietary runtime lock-in.
+Harnesses only see normal filesystem skills after install: no proprietary runtime lock-in.
 
 ![Without a plane vs skill-flow](docs/images/campaign-why.png)
 
@@ -170,7 +170,7 @@ Live (after Pages enable): https://real-limitless.github.io/skill-flow/
 
 ## Status
 
-**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next — see [PLAN.md](./PLAN.md).
+**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next: see [PLAN.md](./PLAN.md).
 
 ---
 
