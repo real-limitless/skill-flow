@@ -34,6 +34,21 @@ export async function writeEntry(
   return file;
 }
 
+/** Write a new shard; refuse to clobber the same id unless force. */
+export async function addEntry(
+  catalogDir: string,
+  entry: SkillGalleryEntry,
+  opts: { force?: boolean } = {},
+): Promise<string> {
+  const existing = await readEntry(catalogDir, entry.id);
+  if (existing && !opts.force) {
+    throw new Error(
+      `catalog entry already exists: ${entry.id} (pass --force to overwrite)`,
+    );
+  }
+  return writeEntry(catalogDir, entry);
+}
+
 export async function readEntry(
   catalogDir: string,
   id: string,

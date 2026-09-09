@@ -8,7 +8,7 @@ import {
   readEntry,
   rebuildIndex,
   searchIndex,
-  writeEntry,
+  addEntry,
 } from "./catalog/shard.js";
 import { entryFromLocalPackage } from "./catalog/from-package.js";
 import {
@@ -135,6 +135,7 @@ async function main() {
     .argument("<path>")
     .option("--catalog <dir>", "catalog dir", defaultCatalogDir())
     .option("--id <id>", "stable id override")
+    .option("--force", "overwrite existing id", false)
     .option("--tag <tag>", "tag (repeatable)", (v, acc: string[]) => {
       acc.push(v);
       return acc;
@@ -142,7 +143,7 @@ async function main() {
     .action(
       async (
         path: string,
-        opts: { catalog: string; id?: string; tag: string[] },
+        opts: { catalog: string; id?: string; tag: string[]; force?: boolean },
       ) => {
         const pkg = await loadLocalSkill(path);
         const entry = await entryFromLocalPackage(pkg, {
@@ -150,7 +151,7 @@ async function main() {
           provenance: "manual",
           tags: opts.tag,
         });
-        await writeEntry(opts.catalog, entry);
+        await addEntry(opts.catalog, entry, { force: Boolean(opts.force) });
         await rebuildIndex(opts.catalog);
         printJson({ wrote: entry.id, name: entry.name });
       },
@@ -182,6 +183,7 @@ async function main() {
     .option("-y, --yes", "confirm install", false)
     .option("--project <dir>", "project root for project scope")
     .option("--path <dir>", "generic install parent directory")
+    .option("--subpath <dir>", "subdirectory in a git clone that contains SKILL.md")
     .option("--catalog <dir>", "catalog dir", defaultCatalogDir())
     .action(
       async (
@@ -194,6 +196,7 @@ async function main() {
           yes?: boolean;
           project?: string;
           path?: string;
+          subpath?: string;
           catalog: string;
         },
       ) => {
@@ -207,6 +210,7 @@ async function main() {
             confirm: Boolean(opts.yes),
             projectRoot: opts.project,
             genericPath: opts.path,
+            subpath: opts.subpath,
           },
           { catalogLookup: catalogLookup(opts.catalog) },
         );
@@ -260,9 +264,11 @@ async function main() {
     .command("audit")
     .argument("<source>")
     .option("--catalog <dir>", "catalog dir", defaultCatalogDir())
-    .action(async (source: string, opts: { catalog: string }) => {
+    .option("--subpath <dir>", "subdirectory in a git clone that contains SKILL.md")
+    .action(async (source: string, opts: { catalog: string; subpath?: string }) => {
       const { pkg, resolvedFrom } = await resolveSkillSource(source, {
         catalogLookup: catalogLookup(opts.catalog),
+        subpath: opts.subpath,
       });
       const audit = await auditPackage(pkg);
       printJson({
@@ -277,7 +283,9 @@ async function main() {
   // ensure home exists for state
   await mkdir(skillFlowHome(), { recursive: true }).catch(() => undefined);
 
+  const keepAlive = process.argv.slice(2)[0] === "serve";
   await program.parseAsync(process.argv);
+  if (!keepAlive) process.exit(process.exitCode ?? 0);
 }
 
 main().catch((err) => {

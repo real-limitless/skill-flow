@@ -101,11 +101,14 @@ export function createSkillFlowServer(opts: {
           properties: {
             source: {
               type: "string",
-              description: "Local path, catalog id, or git URL",
             },
             path: {
               type: "string",
               description: "Relative path within skill (default SKILL.md)",
+            },
+            subpath: {
+              type: "string",
+              description: "Subdirectory in a git clone that contains SKILL.md",
             },
           },
           required: ["source"],
@@ -119,6 +122,10 @@ export function createSkillFlowServer(opts: {
           type: "object",
           properties: {
             source: { type: "string" },
+            subpath: {
+              type: "string",
+              description: "Subdirectory in a git clone that contains SKILL.md",
+            },
           },
           required: ["source"],
         },
@@ -141,6 +148,10 @@ export function createSkillFlowServer(opts: {
             },
             projectRoot: { type: "string" },
             genericPath: { type: "string" },
+            subpath: {
+              type: "string",
+              description: "Subdirectory in a git clone that contains SKILL.md",
+            },
           },
           required: ["source", "confirm"],
         },
@@ -248,6 +259,8 @@ export function createSkillFlowServer(opts: {
           }
           const { pkg } = await resolveSkillSource(source, {
             catalogLookup: catalogLookup(catalogDir),
+            subpath:
+              typeof args.subpath === "string" ? args.subpath : undefined,
           });
           if (!pkg.files.includes(rel) && rel !== "SKILL.md") {
             return text({
@@ -262,6 +275,8 @@ export function createSkillFlowServer(opts: {
           const source = String(args.source ?? "");
           const { pkg, resolvedFrom } = await resolveSkillSource(source, {
             catalogLookup: catalogLookup(catalogDir),
+            subpath:
+              typeof args.subpath === "string" ? args.subpath : undefined,
           });
           const audit = await auditPackage(pkg);
           return text({
@@ -289,6 +304,8 @@ export function createSkillFlowServer(opts: {
                 typeof args.genericPath === "string"
                   ? args.genericPath
                   : undefined,
+              subpath:
+                typeof args.subpath === "string" ? args.subpath : undefined,
             },
             { catalogLookup: catalogLookup(catalogDir) },
           );

@@ -17,6 +17,7 @@
       property="og:image"
       content="https://raw.githubusercontent.com/real-limitless/skill-flow/main/docs/images/campaign-hero.png"
     />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="assets/styles.css" />
     <script src="assets/config.js"></script>
   </head>
@@ -59,11 +60,9 @@
 
       <div class="panel" style="margin-bottom: 28px; overflow: hidden">
         <img
-          src="../docs/images/campaign-hero.png"
+          src="assets/campaign-hero.png"
           alt="skill-flow campaign hero"
           style="width: 100%; display: block; max-height: 420px; object-fit: cover; object-position: top"
-          onerror="this.style.display='none'"
-          id="hero-img"
         />
       </div>
 
@@ -102,15 +101,5 @@
       </footer>
     </div>
     <script type="module" src="assets/site.js"></script>
-    <script>
-      // Prefer images from site/out after build
-      const img = document.getElementById("hero-img");
-      if (img) {
-        img.src = "assets/campaign-hero.png";
-        img.onerror = () => {
-          img.src = "../docs/images/campaign-hero.png";
-        };
-      }
-    </script>
   </body>
 </html>

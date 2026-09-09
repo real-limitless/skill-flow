@@ -1,9 +1,9 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { installSkill, uninstallSkill } from "../src/harness/install.js";
-import { writeMinimalSkill } from "../src/package/resolve-source.js";
+import { writeMinimalSkill, resolveCloneSkillRoot } from "../src/package/resolve-source.js";
 import { auditPackage } from "../src/audit/scan.js";
 import { loadLocalSkill } from "../src/package/load-local.js";
 
@@ -67,5 +67,23 @@ describe("auditPackage", () => {
     const audit = await auditPackage(pkg);
     expect(audit.hasScripts).toBe(true);
     expect(audit.flags.some((f) => f.id === "has-scripts")).toBe(true);
+  });
+});
+
+describe("resolveCloneSkillRoot", () => {
+  it("errors when a clone has more than one SKILL.md", async () => {
+    const root = await mkdtemp(join(tmpdir(), "sf-clone-"));
+    temps.push(root);
+    const a = join(root, "one");
+    const b = join(root, "two");
+    await mkdir(a);
+    await mkdir(b);
+    await writeMinimalSkill(a, "one-skill", "First skill in a multi-skill clone.");
+    await writeMinimalSkill(b, "two-skill", "Second skill in a multi-skill clone.");
+    await expect(resolveCloneSkillRoot(root, { url: "https://example.com/repo" })).rejects.toThrow(
+      /--subpath/,
+    );
+    const picked = await resolveCloneSkillRoot(root, { subpath: "two" });
+    expect(picked).toBe(join(root, "two"));
   });
 });

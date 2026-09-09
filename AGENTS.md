@@ -59,7 +59,7 @@ npm run catalog:seed
 npm run catalog:validate
 npm run campaign:capture   # playwright → docs/images
 npm run site:build
-npx skill-flow doctor
+npx @real-limitless/skill-flow doctor
 ```
 
 ## Ritual

@@ -1,5 +1,5 @@
 {
-  "name": "skill-flow",
+  "name": "@real-limitless/skill-flow",
   "version": "0.1.0",
   "description": "Agent Skills catalog + install plane — search, audit, and install SKILL.md packages into any harness",
   "type": "module",
@@ -9,6 +9,9 @@
   },
   "bin": {
     "skill-flow": "./dist/cli.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "exports": {
     ".": "./dist/index.js"
@@ -25,7 +28,7 @@
     "catalog:seed": "tsx scripts/catalog/seed.ts",
     "catalog:validate": "tsx scripts/catalog/validate.ts",
     "site:build": "tsx scripts/site/build-pages.ts",
-    "site:preview": "npm run catalog:seed && SITE_BASE= npm run site:build && npx --yes serve site/out -p 4173",
+    "site:preview": "npm run catalog:seed && SITE_BASE= npm run site:build && npx --yes serve site/out -p 4173 --config site/serve.json",
     "campaign:capture": "bash docs/campaign/capture.sh"
   },
   "dependencies": {
@@ -41,5 +44,8 @@
     "tsx": "^4.23.12",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "fast-uri": "^3.1.6"
   }
 }

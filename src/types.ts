@@ -85,6 +85,9 @@ export interface InstallRequest {
   genericPath?: string;
   /** Optional harness id when target is harness: */
   harnessId?: string;
+  /** Git clone subdirectory that contains SKILL.md */
+  subpath?: string;
+  ref?: string;
 }
 
 export interface InstallResult {
