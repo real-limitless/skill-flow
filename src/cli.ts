@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { readFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir } from "node:fs/promises";
 import { auditPackage } from "./audit/scan.js";
 import {
   loadIndex,
@@ -21,12 +20,8 @@ import { detectHarnesses, HARNESS_REGISTRY } from "./harness/registry.js";
 import { loadLocalSkill } from "./package/load-local.js";
 import { resolveSkillSource } from "./package/resolve-source.js";
 import { runStdioServer } from "./mcp/server.js";
-import {
-  defaultCatalogDir,
-  packageRoot,
-  projectRoot,
-  skillFlowHome,
-} from "./paths.js";
+import { doctorReport, startHealthServer } from "./health.js";
+import { defaultCatalogDir, skillFlowHome } from "./paths.js";
 import type { InstallScope } from "./types.js";
 
 const VERSION = "0.1.0";
@@ -50,9 +45,17 @@ async function main() {
 
   program
     .command("serve")
-    .description("Run MCP server (stdio)")
+    .description("Run MCP server (stdio) or HTTP health")
     .option("--catalog <dir>", "catalog directory", defaultCatalogDir())
-    .action(async (opts: { catalog: string }) => {
+    .option("--http", "HTTP health listener (family port 8788)")
+    .option("--host <host>", "HTTP bind host", process.env.SKILL_FLOW_HOST || "0.0.0.0")
+    .option("-p, --port <port>", "HTTP port", process.env.SKILL_FLOW_PORT || "8788")
+    .action(async (opts: { catalog: string; http?: boolean; host: string; port: string }) => {
+      if (opts.http) {
+        process.env.SKILL_FLOW_PORT = String(opts.port);
+        await startHealthServer({ host: opts.host, port: Number(opts.port) });
+        return;
+      }
       await runStdioServer({ catalogDir: opts.catalog });
     });
 
@@ -60,25 +63,7 @@ async function main() {
     .command("doctor")
     .description("Environment + catalog health")
     .action(async () => {
-      const catalogDir = defaultCatalogDir();
-      let meta: unknown = null;
-      try {
-        meta = JSON.parse(await readFile(join(catalogDir, "meta.json"), "utf8"));
-      } catch {
-        meta = null;
-      }
-      const harnesses = await detectHarnesses();
-      printJson({
-        ok: true,
-        version: VERSION,
-        packageRoot: packageRoot(),
-        skillFlowHome: skillFlowHome(),
-        catalogDir,
-        catalogMeta: meta,
-        projectRoot: projectRoot(),
-        harnessesPresent: harnesses.filter((h) => h.present).map((h) => h.id),
-        node: process.version,
-      });
+      printJson(await doctorReport());
     });
 
   program

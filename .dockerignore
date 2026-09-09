@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+dist
+docs
+site
+scripts/factory
+*.log
+.env
+.env.*
+!.env.example

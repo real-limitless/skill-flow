@@ -41,6 +41,18 @@ Harnesses only see normal filesystem skills after install — no proprietary run
 
 ## Quickstart
 
+```bash
+git clone -b DEVELOPMENT https://github.com/real-limitless/skill-flow.git
+cd skill-flow
+docker compose up -d --build
+# health: http://127.0.0.1:8788/health
+npx skill-flow doctor
+```
+
+The container listens on **8788**. MCP stdio is still `npx skill-flow serve` (or `docker compose exec skill-flow node dist/cli.js serve`).
+
+Host Node (contributors):
+
 Requirements: **Node.js ≥ 22**, `git` on PATH (for remote installs).
 
 ```bash
