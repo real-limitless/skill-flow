@@ -100,7 +100,7 @@ body.frame-body {
   height: 28px;
   background: linear-gradient(145deg, var(--accent-hot), var(--vault));
   clip-path: polygon(50% 0, 100% 35%, 82% 100%, 18% 100%, 0 35%);
-  box-shadow: 0 0 22px rgba(91, 141, 239, 0.4);
+  box-shadow: 0 0 22px rgba(45, 212, 191, 0.4);
 }
 
 .brand-name {
@@ -139,7 +139,7 @@ body.frame-body {
 
 .pill.accent {
   color: var(--accent-hot);
-  border-color: rgba(91, 141, 239, 0.45);
+  border-color: rgba(45, 212, 191, 0.45);
 }
 
 .pill.vault {
@@ -318,8 +318,8 @@ h2.section-title {
 
 .bubble.user {
   align-self: flex-end;
-  background: rgba(91, 141, 239, 0.12);
-  border: 1px solid rgba(91, 141, 239, 0.32);
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.32);
   color: var(--ink);
 }
 
@@ -448,8 +448,8 @@ h2.section-title {
 }
 
 .topo-chip {
-  background: rgba(91, 141, 239, 0.12);
-  border: 1px solid rgba(91, 141, 239, 0.4);
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.4);
   padding: 10px 14px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -470,7 +470,7 @@ h2.section-title {
   padding: 16px 32px;
   text-align: center;
   min-width: 300px;
-  box-shadow: 0 0 40px rgba(91, 141, 239, 0.14);
+  box-shadow: 0 0 40px rgba(45, 212, 191, 0.14);
 }
 
 .topo-hub .name {
@@ -674,7 +674,7 @@ h2.section-title {
 }
 .badge.place {
   color: var(--accent-hot);
-  border-color: rgba(91, 141, 239, 0.35);
+  border-color: rgba(45, 212, 191, 0.35);
 }
 .badge.seal {
   color: var(--vault-hot);
@@ -710,7 +710,7 @@ h2.section-title {
   color: var(--dim);
 }
 .tui .sel {
-  background: rgba(91, 141, 239, 0.18);
+  background: rgba(45, 212, 191, 0.18);
   color: var(--ink);
 }
 .tui .vault {
@@ -774,7 +774,7 @@ h2.section-title {
 }
 
 .tag.hot {
-  border-color: rgba(91, 141, 239, 0.45);
+  border-color: rgba(45, 212, 191, 0.45);
   color: var(--accent-hot);
 }
 
