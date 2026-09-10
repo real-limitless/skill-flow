@@ -1,6 +1,6 @@
 # Competitive feature gap: skill-flow vs Agent Skills catalogs and install planes
 
-**Status:** open tracking issue  
+**Status:** open tracking issue [#16](https://github.com/real-limitless/skill-flow/issues/16)  
 **Date:** 2026-09-10  
 **Baseline:** `CORE` (this branch) plus runnable product on `DEVELOPMENT` / `main` @ P4 HTTP `/mcp` + `/admin`. Factory (PLAN P2) is still todo.  
 **Related:** #10 (QA viability), PLAN.md P2 factory.
