@@ -14,6 +14,7 @@ services:
       SKILL_FLOW_HOST: "0.0.0.0"
       SKILL_FLOW_PORT: "8788"
       SKILL_FLOW_CATALOG_DIR: /app/catalog
+      SKILL_FLOW_HOME: /data
     volumes:
       - skill-flow-home:/data
     restart: unless-stopped

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { mkdir } from "node:fs/promises";
+import { parseCredentials } from "./auth/http.js";
 import { auditPackage } from "./audit/scan.js";
 import {
   loadIndex,
@@ -20,8 +21,10 @@ import { detectHarnesses, HARNESS_REGISTRY } from "./harness/registry.js";
 import { loadLocalSkill } from "./package/load-local.js";
 import { resolveSkillSource } from "./package/resolve-source.js";
 import { runStdioServer } from "./mcp/server.js";
-import { doctorReport, startHealthServer } from "./health.js";
-import { defaultCatalogDir, skillFlowHome } from "./paths.js";
+import { ControlStore } from "./db/control.js";
+import { doctorReport } from "./health.js";
+import { startHttpServer } from "./http/server.js";
+import { controlDbPath, defaultCatalogDir, skillFlowHome } from "./paths.js";
 import type { InstallScope } from "./types.js";
 
 const VERSION = "0.1.0";
@@ -45,19 +48,37 @@ async function main() {
 
   program
     .command("serve")
-    .description("Run MCP server (stdio) or HTTP health")
+    .description("Run MCP server (stdio) or HTTP /mcp + /admin")
     .option("--catalog <dir>", "catalog directory", defaultCatalogDir())
-    .option("--http", "HTTP health listener (family port 8788)")
+    .option("--http", "HTTP /health + /admin + /v1 + /mcp (family port 8788)")
     .option("--host <host>", "HTTP bind host", process.env.SKILL_FLOW_HOST || "0.0.0.0")
     .option("-p, --port <port>", "HTTP port", process.env.SKILL_FLOW_PORT || "8788")
-    .action(async (opts: { catalog: string; http?: boolean; host: string; port: string }) => {
-      if (opts.http) {
-        process.env.SKILL_FLOW_PORT = String(opts.port);
-        await startHealthServer({ host: opts.host, port: Number(opts.port) });
-        return;
-      }
-      await runStdioServer({ catalogDir: opts.catalog });
-    });
+    .option("--db <path>", "operator control sqlite path")
+    .action(
+      async (opts: {
+        catalog: string;
+        http?: boolean;
+        host: string;
+        port: string;
+        db?: string;
+      }) => {
+        if (opts.http) {
+          process.env.SKILL_FLOW_PORT = String(opts.port);
+          await startHttpServer({
+            host: opts.host,
+            port: Number(opts.port),
+            catalogDir: opts.catalog,
+            dbPath: opts.db,
+            adminToken: process.env.SKILL_FLOW_ADMIN_TOKEN,
+          });
+          await new Promise<void>(() => {
+            /* keep alive until SIGTERM */
+          });
+          return;
+        }
+        await runStdioServer({ catalogDir: opts.catalog });
+      },
+    );
 
   program
     .command("doctor")
@@ -278,6 +299,55 @@ async function main() {
         warnings: pkg.parsed.warnings,
         audit,
       });
+    });
+
+  const operatorCmd = program
+    .command("operator")
+    .description("Manage local /admin operators (not agent MCP keys)");
+
+  operatorCmd
+    .command("add")
+    .description("Create an operator (first user or additional)")
+    .requiredOption("--email <email>", "operator email")
+    .requiredOption("--password <password>", "password (8+ characters)")
+    .option("--db <path>", "control sqlite path")
+    .action((opts: { email: string; password: string; db?: string }) => {
+      const creds = parseCredentials({
+        email: opts.email,
+        password: opts.password,
+      });
+      if ("error" in creds) {
+        console.error(creds.error);
+        process.exit(1);
+      }
+      const store = new ControlStore(controlDbPath(opts.db));
+      try {
+        const operator = store.createOperator(creds.email, creds.password);
+        store.writeAudit(
+          store.countOperators() === 1 ? "operator.setup" : "operator.create",
+          { email: operator.email },
+        );
+        printJson({ operator });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(/UNIQUE|unique/i.test(msg) ? "email already exists" : msg);
+        process.exit(1);
+      } finally {
+        store.close();
+      }
+    });
+
+  operatorCmd
+    .command("list")
+    .description("List operators")
+    .option("--db <path>", "control sqlite path")
+    .action((opts: { db?: string }) => {
+      const store = new ControlStore(controlDbPath(opts.db));
+      try {
+        printJson({ operators: store.listOperators() });
+      } finally {
+        store.close();
+      }
     });
 
   // ensure home exists for state
