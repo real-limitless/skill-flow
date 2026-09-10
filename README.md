@@ -173,7 +173,7 @@ Live (after Pages enable): https://real-limitless.github.io/skill-flow/
 
 ## Status
 
-**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next: see [PLAN.md](./PLAN.md).
+**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next: see [PLAN.md](./PLAN.md). Competitive gaps vs other Agent Skills catalogs and installers: [docs/competition-feature-gap.md](./docs/competition-feature-gap.md).
 
 ---
 
