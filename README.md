@@ -49,7 +49,7 @@ docker compose up -d --build
 npx @real-limitless/skill-flow doctor
 ```
 
-The container listens on **8788**. MCP stdio is still `npx @real-limitless/skill-flow serve` (or `docker compose exec skill-flow node dist/cli.js serve`). Unscoped `npx skill-flow` is a **different** npm package.
+The container listens on **8788** (`/health`, `/admin`, `/mcp`). MCP stdio is still `npx @real-limitless/skill-flow serve` (or `docker compose exec skill-flow node dist/cli.js serve`). Unscoped `npx skill-flow` is a **different** npm package.
 
 Host Node (contributors):
 
@@ -99,6 +99,23 @@ Or point at a local build:
 }
 ```
 
+### HTTP `/mcp` + operator admin
+
+`serve --http` is the control plane (not health-only): `/health`, browser `/admin`, `/v1`, Streamable HTTP `/mcp`.
+
+```bash
+npx @real-limitless/skill-flow serve --http --host 127.0.0.1 --port 8788
+# first operator: http://127.0.0.1:8788/admin/  → setup, then login
+# extra operators: skill-flow operator add --email other@example.com --password '********'
+```
+
+Accounts are **local to this skill-flow instance** (not shared with mcp-flow, ansible-flow, wiki-flow, or CleanFlow). After the first operator exists, signup is closed.
+
+- Browser `/admin` uses email/password + httpOnly cookie (`sf_op`) and CSRF on mutations.
+- `SKILL_FLOW_ADMIN_TOKEN` is break-glass **Bearer** for `/v1` and `/mcp` (not a login password).
+- HTTP `/mcp` is never unauthenticated. Stdio `serve` remains process-trust (no web login).
+- Control DB: `$SKILL_FLOW_HOME/control.sqlite` (or `SKILL_FLOW_DB_PATH`). Catalog JSON and disk installs are unchanged.
+
 ### Agent ritual (MCP tools)
 
 | Tool | Purpose |
@@ -143,6 +160,9 @@ Git URLs must be a **skill package** (one `SKILL.md`). This product repo is not 
 
 ```bash
 skill-flow serve
+skill-flow serve --http
+skill-flow operator add --email ops@example.com --password '********'
+skill-flow operator list
 skill-flow doctor
 skill-flow harness list|detect
 skill-flow catalog search|show|list|add|reindex
@@ -189,7 +209,7 @@ Live (after Pages enable): https://real-limitless.github.io/skill-flow/
 
 ## Status
 
-**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next: see [PLAN.md](./PLAN.md).
+**P1 install plane + seed catalog + campaign + static site + HTTP `/mcp` + `/admin` implemented.** Factory scrape is next: see [PLAN.md](./PLAN.md).
 
 ---
 

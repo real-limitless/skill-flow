@@ -23,11 +23,15 @@
 | P1b catalog schema + seed | done |
 | P2 factory scrape/enrich | todo |
 | P3 static site + campaign | done |
-| P4 TUI + HTTP `/mcp` + update | todo |
+| P4 HTTP `/mcp` + browser `/admin` | done (TUI deferred) |
 
 ## Architecture
 
 See README. Control plane writes skill trees; harnesses discover natively.
+
+### P4 control plane
+
+`skill-flow serve --http` serves `/health`, browser `/admin` (email/password operators), `/v1/*`, and Streamable HTTP `/mcp`. Accounts are **local to this instance** (not shared with mcp-flow or other Flow products). Env `SKILL_FLOW_ADMIN_TOKEN` remains break-glass Bearer for `/v1` and `/mcp`. Stdio `serve` (no `--http`) is unchanged. A curses TUI is **not** in this phase.
 
 ## Non-goals (v1)
 

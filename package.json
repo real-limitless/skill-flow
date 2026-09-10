@@ -17,7 +17,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && mkdir -p dist/admin && cp -f src/admin/* dist/admin/",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "cli": "tsx src/cli.ts",
@@ -32,8 +32,10 @@
     "campaign:capture": "bash docs/campaign/capture.sh"
   },
   "dependencies": {
+    "@hono/node-server": "^1.14.4",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "commander": "^14.0.1",
+    "hono": "^4.13.1",
     "undici": "^6.21.0",
     "yaml": "^2.8.0",
     "zod": "^3.25.76"

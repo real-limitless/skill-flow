@@ -39,6 +39,15 @@ export function statePath(): string {
   return join(skillFlowHome(), "state.json");
 }
 
+/** Operators / sessions / audit log (not catalog shards). */
+export function controlDbPath(override?: string): string {
+  if (override?.trim()) return resolve(override.trim());
+  if (process.env.SKILL_FLOW_DB_PATH?.trim()) {
+    return resolve(process.env.SKILL_FLOW_DB_PATH.trim());
+  }
+  return join(skillFlowHome(), "control.sqlite");
+}
+
 export function cacheDir(): string {
   return join(skillFlowHome(), "cache");
 }
