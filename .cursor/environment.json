@@ -1,0 +1,4 @@
+{
+  "name": "skill-flow CORE",
+  "start": "bash .cursor/strip-cursor-coauthor.sh"
+}
