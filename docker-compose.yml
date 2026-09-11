@@ -5,8 +5,8 @@ services:
     build: .
     image: skill-flow:local
     container_name: skill-flow
-    ports:
-      - "${SKILL_FLOW_PORT:-8788}:8788"
+    expose:
+      - "8788"
     env_file:
       - path: .env
         required: false
