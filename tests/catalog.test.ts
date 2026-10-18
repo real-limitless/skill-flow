@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { entryFromLocalPackage } from "../src/catalog/from-package.js";
 import {
+  addEntry,
   rebuildIndex,
   searchIndex,
   writeEntry,
@@ -42,5 +43,31 @@ describe("catalog shards", () => {
     expect(hits[0]?.name).toBe("search-me-skill");
     const again = await readEntry(catalogDir, "seed:search-me-skill");
     expect(again?.name).toBe("search-me-skill");
+  });
+
+  it("refuses to overwrite the same id without force", async () => {
+    const catalogDir = await mkdtemp(join(tmpdir(), "sf-cat-"));
+    const skillDir = await mkdtemp(join(tmpdir(), "sf-sk-"));
+    temps.push(catalogDir, skillDir);
+    await writeMinimalSkill(skillDir, "dup-skill", "Duplicate catalog add test.");
+    const pkg = await loadLocalSkill(skillDir);
+    const entry = await entryFromLocalPackage(pkg, { id: "local:hello-dup" });
+    await addEntry(catalogDir, entry);
+    await expect(addEntry(catalogDir, entry)).rejects.toThrow(/already exists/);
+    await addEntry(catalogDir, entry, { force: true });
+    const again = await readEntry(catalogDir, "local:hello-dup");
+    expect(again?.id).toBe("local:hello-dup");
+  });
+
+  it("stores repo-relative localPath for in-tree skills", async () => {
+    const seed = join(process.cwd(), "catalog", "seed", "hello-skill");
+    const pkg = await loadLocalSkill(seed);
+    const entry = await entryFromLocalPackage(pkg, {
+      id: "seed:hello-skill",
+      sourceUrl: "catalog/seed/hello-skill",
+    });
+    expect(entry.package.localPath).toBe("catalog/seed/hello-skill");
+    expect(entry.source.url).toBe("catalog/seed/hello-skill");
+    expect(entry.package.localPath).not.toMatch(/^\/home\//);
   });
 });

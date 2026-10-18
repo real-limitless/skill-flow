@@ -38,6 +38,8 @@ export async function installSkill(
 
   const { pkg, resolvedFrom } = await resolveSkillSource(req.source, {
     catalogLookup: opts.catalogLookup,
+    subpath: req.subpath,
+    ref: req.ref,
   });
   const audit = await auditPackage(pkg);
   const warnings = [...pkg.parsed.warnings];

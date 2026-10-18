@@ -44,12 +44,27 @@ Harnesses only see normal filesystem skills after install: no proprietary runtim
 ```bash
 git clone -b DEVELOPMENT https://github.com/real-limitless/skill-flow.git
 cd skill-flow
+# optional: copy .env.example to .env and set SKILL_FLOW_ADMIN_TOKEN
 docker compose up -d --build
-# health: http://127.0.0.1:8788/health
-npx skill-flow doctor
+docker compose exec skill-flow node -e "fetch('http://127.0.0.1:8788/health').then(r=>r.text()).then(console.log)"
+npx @real-limitless/skill-flow doctor
 ```
 
-The container listens on **8788**. MCP stdio is still `npx skill-flow serve` (or `docker compose exec skill-flow node dist/cli.js serve`).
+The container listens on **8788** (`/health`, `/admin`, `/mcp`). Compose **exposes** that port on the project network and does not publish it on the host, so a dev stack and a prod stack can run on one machine behind Traefik. There is no fixed `container_name`. Copy [`.env.example`](./.env.example) to `.env` (Compose loads it when the file exists).
+
+| Variable | When it matters |
+| --- | --- |
+| `COMPOSE_PROJECT_NAME` | Required to differ per stack when dev and prod share a Docker host. Isolates containers, networks, and the `skill-flow-home` volume. |
+| `SKILL_FLOW_IMAGE` | Set a distinct tag when two stacks **build** on the same daemon. Default is `skill-flow:${COMPOSE_PROJECT_NAME:-local}`. |
+| `SKILL_FLOW_PORT` | Listen port inside the container. Default `8788`. Not a host publish. |
+| `SKILL_FLOW_HOST` | Bind address. Compose sets `0.0.0.0`. |
+| `SKILL_FLOW_HOME` | State directory. Compose sets `/data` (the named volume). |
+| `SKILL_FLOW_DB_PATH` | Operator sqlite. Default `$SKILL_FLOW_HOME/control.sqlite`. |
+| `SKILL_FLOW_CATALOG_DIR` | Catalog directory. Compose sets `/app/catalog`. |
+| `SKILL_FLOW_ADMIN_TOKEN` | Break-glass Bearer for `/v1` and HTTP `/mcp`. Not the browser login password. `/health` and `/admin` setup do not need it. |
+| `GITHUB_TOKEN` | Optional. Raises GitHub API rate limits for remote skill fetches. |
+
+MCP stdio is still `npx @real-limitless/skill-flow serve` (or `docker compose exec skill-flow node dist/cli.js serve`). Unscoped `npx skill-flow` is a **different** npm package.
 
 Host Node (contributors):
 
@@ -60,17 +75,17 @@ npm install
 npm run build
 npm run catalog:seed
 
-npx skill-flow doctor
-npx skill-flow catalog search commit
-npx skill-flow audit seed:hello-skill
-npx skill-flow install seed:hello-skill --target portable --yes
-npx skill-flow list
+npx @real-limitless/skill-flow doctor
+npx @real-limitless/skill-flow catalog search commit
+npx @real-limitless/skill-flow audit seed:hello-skill
+npx @real-limitless/skill-flow install seed:hello-skill --target portable --yes
+npx @real-limitless/skill-flow list
 ```
 
 ### MCP (stdio)
 
 ```bash
-npx skill-flow serve
+npx @real-limitless/skill-flow serve
 ```
 
 OpenCode / Cursor-style config:
@@ -80,7 +95,7 @@ OpenCode / Cursor-style config:
   "mcpServers": {
     "skill-flow": {
       "command": "npx",
-      "args": ["skill-flow", "serve"]
+      "args": ["@real-limitless/skill-flow", "serve"]
     }
   }
 }
@@ -99,14 +114,33 @@ Or point at a local build:
 }
 ```
 
+### HTTP `/mcp` + operator admin
+
+`serve --http` is the control plane (not health-only): `/health`, browser `/admin`, `/v1`, Streamable HTTP `/mcp`.
+
+```bash
+npx @real-limitless/skill-flow serve --http --host 127.0.0.1 --port 8788
+# first operator: http://127.0.0.1:8788/admin/  → setup, then login
+# extra operators: skill-flow operator add --email other@example.com --password '********'
+```
+
+Accounts are **local to this skill-flow instance** (not shared with mcp-flow, ansible-flow, wiki-flow, or CleanFlow). After the first operator exists, signup is closed.
+
+- Browser `/admin` uses email/password + httpOnly cookie (`sf_op`) and CSRF on mutations.
+- `SKILL_FLOW_ADMIN_TOKEN` is break-glass **Bearer** for `/v1` and `/mcp` (not a login password).
+- HTTP `/mcp` is never unauthenticated. Stdio `serve` remains process-trust (no web login).
+- Control DB: `$SKILL_FLOW_HOME/control.sqlite` (or `SKILL_FLOW_DB_PATH`). Catalog JSON and disk installs are unchanged.
+
 ### Agent ritual (MCP tools)
 
 | Tool | Purpose |
 | --- | --- |
 | `sf_search_skills` | Catalog search |
 | `sf_show_skill` | Full gallery entry |
+| `sf_get_skill_file` | Preview a file in a skill tree |
 | `sf_audit_skill` | Static risk heuristics |
 | `sf_install_skill` | Write skill tree (`confirm: true`) |
+| `sf_uninstall_skill` | Remove an installed skill |
 | `sf_list_installed` | Scan harness roots |
 | `sf_list_harnesses` | Adapter matrix + detect |
 | `sf_status` | Health |
@@ -127,10 +161,13 @@ Or point at a local build:
 Scope: `--scope user|project`.
 
 ```bash
-npx skill-flow install ./my-skill --target harness:opencode --scope user --yes
-npx skill-flow install https://github.com/org/repo --yes
-npx skill-flow uninstall hello-skill --target portable
+npx @real-limitless/skill-flow install ./my-skill --target harness:opencode --scope user --yes
+npx @real-limitless/skill-flow install https://github.com/org/skill-repo --yes
+npx @real-limitless/skill-flow install https://github.com/org/monorepo --subpath packages/my-skill --yes
+npx @real-limitless/skill-flow uninstall hello-skill --target portable
 ```
+
+Git URLs must be a **skill package** (one `SKILL.md`). This product repo is not a skill; use `--subpath catalog/seed/hello-skill` if you clone it anyway. Multiple `SKILL.md` files fail until you pass `--subpath`.
 
 ---
 
@@ -138,6 +175,9 @@ npx skill-flow uninstall hello-skill --target portable
 
 ```bash
 skill-flow serve
+skill-flow serve --http
+skill-flow operator add --email ops@example.com --password '********'
+skill-flow operator list
 skill-flow doctor
 skill-flow harness list|detect
 skill-flow catalog search|show|list|add|reindex
@@ -184,7 +224,7 @@ Live (after Pages enable): https://real-limitless.github.io/skill-flow/
 
 ## Status
 
-**P1 install plane + seed catalog + campaign + static site implemented.** Factory scrape and HTTP gateway are next: see [PLAN.md](./PLAN.md).
+**P1 install plane + seed catalog + campaign + static site + HTTP `/mcp` + `/admin` implemented.** Factory scrape is next: see [PLAN.md](./PLAN.md).
 
 ---
 

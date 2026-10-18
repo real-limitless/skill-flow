@@ -12,8 +12,8 @@ Normalized **Agent Skills** gallery (`SkillGalleryEntry`).
 
 ```bash
 npm run catalog:seed
-npx skill-flow catalog search pdf
-npx skill-flow catalog show seed:hello-skill
+npx @real-limitless/skill-flow catalog search pdf
+npx @real-limitless/skill-flow catalog show seed:hello-skill
 ```
 
 Schema version: **1.0.0** (`src/catalog/constants.ts`).

@@ -1,5 +1,6 @@
 import { CATALOG_SCHEMA_VERSION } from "./constants.js";
 import { auditPackage, auditReportToSecurity } from "../audit/scan.js";
+import { toRepoRelativePath } from "../paths.js";
 import type { SkillGalleryEntry, SkillPackageInfo, SkillProvenance } from "../types.js";
 
 export async function entryFromLocalPackage(
@@ -37,12 +38,12 @@ export async function entryFromLocalPackage(
     provenance: opts.provenance ?? "manual",
     source: {
       kind: "local",
-      url: opts.sourceUrl ?? pkg.root,
+      url: opts.sourceUrl ?? toRepoRelativePath(pkg.root),
       skillPath: "SKILL.md",
     },
     package: {
       kind: "local-path",
-      localPath: pkg.root,
+      localPath: toRepoRelativePath(pkg.root),
       files: pkg.files,
     },
     skillMd: {

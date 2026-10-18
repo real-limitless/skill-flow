@@ -1,10 +1,15 @@
+# Dev and prod may share one Docker host. Do not pin container_name or a host
+# port: those are global to the daemon and the second stack fails to start.
+# Give each stack its own project name (Dokploy sets COMPOSE_PROJECT_NAME per
+# application). Networks, volumes, and the default container name then stay
+# distinct. The process still listens on 8788; Traefik routes to the exposed
+# port. Set SKILL_FLOW_IMAGE when two stacks build different tags.
 name: skill-flow
 
 services:
   skill-flow:
     build: .
-    image: skill-flow:local
-    container_name: skill-flow
+    image: ${SKILL_FLOW_IMAGE:-skill-flow:${COMPOSE_PROJECT_NAME:-local}}
     expose:
       - "8788"
     env_file:
@@ -14,6 +19,7 @@ services:
       SKILL_FLOW_HOST: "0.0.0.0"
       SKILL_FLOW_PORT: "8788"
       SKILL_FLOW_CATALOG_DIR: /app/catalog
+      SKILL_FLOW_HOME: /data
     volumes:
       - skill-flow-home:/data
     restart: unless-stopped

@@ -1,9 +1,9 @@
 import { access, cp, mkdir, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { basename, join, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { cacheDir } from "../paths.js";
+import { cacheDir, resolveStoredPath } from "../paths.js";
 import type { SkillGalleryEntry, SkillPackageInfo } from "../types.js";
 import { loadLocalSkill } from "./load-local.js";
 
@@ -78,7 +78,7 @@ export async function resolveGalleryEntry(
   entry: SkillGalleryEntry,
 ): Promise<{ pkg: SkillPackageInfo; resolvedFrom: string }> {
   if (entry.package.kind === "local-path" && entry.package.localPath) {
-    const pkg = await loadLocalSkill(entry.package.localPath);
+    const pkg = await loadLocalSkill(resolveStoredPath(entry.package.localPath));
     return { pkg, resolvedFrom: entry.id };
   }
 
@@ -115,23 +115,11 @@ async function fetchGitSkill(
       );
     }
 
-    let skillRoot = tmp;
-    if (opts.subpath) {
-      skillRoot = join(tmp, opts.subpath);
-    } else if (opts.skillPath) {
-      // skillPath is path to SKILL.md
-      const md = opts.skillPath.endsWith("SKILL.md")
-        ? opts.skillPath
-        : join(opts.skillPath, "SKILL.md");
-      skillRoot = join(tmp, md, "..");
-    } else {
-      // find SKILL.md
-      const found = await findSkillMd(tmp);
-      if (!found) {
-        throw new Error(`no SKILL.md found in cloned repo ${url}`);
-      }
-      skillRoot = join(found, "..");
-    }
+    const skillRoot = await resolveCloneSkillRoot(tmp, {
+      subpath: opts.subpath,
+      skillPath: opts.skillPath,
+      url,
+    });
 
     // copy out of tmp so caller owns stable path under cache
     const nameGuess = basename(skillRoot);
@@ -144,22 +132,63 @@ async function fetchGitSkill(
   }
 }
 
-async function findSkillMd(root: string, depth = 0): Promise<string | null> {
-  if (depth > 5) return null;
+const SKIP_DIRS = new Set([
+  ".git",
+  "node_modules",
+  "dist",
+  "coverage",
+  ".skill-flow-test",
+]);
+
+/** Collect SKILL.md paths under a clone (for tests and git install). */
+export async function findSkillMdFiles(
+  root: string,
+  depth = 0,
+): Promise<string[]> {
+  if (depth > 5) return [];
   const { readdir } = await import("node:fs/promises");
   const ents = await readdir(root, { withFileTypes: true });
+  const files: string[] = [];
   for (const ent of ents) {
     if (ent.isFile() && ent.name === "SKILL.md") {
-      return join(root, ent.name);
+      files.push(join(root, ent.name));
     }
   }
   for (const ent of ents) {
     if (!ent.isDirectory()) continue;
-    if (ent.name === ".git" || ent.name === "node_modules") continue;
-    const found = await findSkillMd(join(root, ent.name), depth + 1);
-    if (found) return found;
+    if (SKIP_DIRS.has(ent.name)) continue;
+    files.push(...(await findSkillMdFiles(join(root, ent.name), depth + 1)));
   }
-  return null;
+  return files;
+}
+
+export async function resolveCloneSkillRoot(
+  cloneRoot: string,
+  opts: { subpath?: string; skillPath?: string; url?: string } = {},
+): Promise<string> {
+  const label = opts.url ?? cloneRoot;
+  if (opts.subpath) {
+    return join(cloneRoot, opts.subpath);
+  }
+  if (opts.skillPath) {
+    const md = opts.skillPath.endsWith("SKILL.md")
+      ? opts.skillPath
+      : join(opts.skillPath, "SKILL.md");
+    return join(cloneRoot, md, "..");
+  }
+  const found = await findSkillMdFiles(cloneRoot);
+  if (found.length === 0) {
+    throw new Error(`no SKILL.md found in cloned repo ${label}`);
+  }
+  if (found.length > 1) {
+    const rels = found
+      .map((f) => relative(cloneRoot, dirname(f)).split("\\").join("/") || ".")
+      .sort();
+    throw new Error(
+      `cloned repo ${label} contains ${found.length} SKILL.md packages (${rels.join(", ")}). Pass --subpath to pick one skill package (a git URL must be a skill tree, not a product monorepo).`,
+    );
+  }
+  return dirname(found[0]);
 }
 
 /** Write a minimal skill for tests / seed */
