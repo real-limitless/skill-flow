@@ -5,6 +5,7 @@ export {
   rebuildIndex,
   searchIndex,
   writeEntry,
+  addEntry,
   listEntries,
   entryFilename,
 } from "./catalog/shard.js";

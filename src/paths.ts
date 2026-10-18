@@ -1,5 +1,5 @@
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PKG_ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -39,6 +39,15 @@ export function statePath(): string {
   return join(skillFlowHome(), "state.json");
 }
 
+/** Operators / sessions / audit log (not catalog shards). */
+export function controlDbPath(override?: string): string {
+  if (override?.trim()) return resolve(override.trim());
+  if (process.env.SKILL_FLOW_DB_PATH?.trim()) {
+    return resolve(process.env.SKILL_FLOW_DB_PATH.trim());
+  }
+  return join(skillFlowHome(), "control.sqlite");
+}
+
 export function cacheDir(): string {
   return join(skillFlowHome(), "cache");
 }
@@ -49,4 +58,18 @@ export function expandHome(p: string): string {
     return join(homeDir(), p.slice(2));
   }
   return p;
+}
+
+/** Prefer repo-relative POSIX paths in catalog JSON (no CI absolute leaks). */
+export function toRepoRelativePath(absPath: string): string {
+  const abs = resolve(absPath);
+  const rel = relative(packageRoot(), abs);
+  if (rel.startsWith("..") || isAbsolute(rel)) return abs;
+  return rel.split("\\").join("/");
+}
+
+export function resolveStoredPath(stored: string): string {
+  if (!stored.trim()) return stored;
+  if (isAbsolute(stored) || stored.startsWith("~")) return expandHome(stored);
+  return resolve(packageRoot(), stored);
 }

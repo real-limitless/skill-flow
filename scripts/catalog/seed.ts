@@ -151,10 +151,9 @@ async function main() {
       provenance: "seed",
       tags: def.tags,
       categories: def.categories,
-      sourceUrl: dir,
+      sourceUrl: `catalog/seed/${def.name}`,
     });
-    // package.localPath should be the seed path relative-friendly absolute
-    entry.package.localPath = dir;
+    entry.package.localPath = `catalog/seed/${def.name}`;
     await writeEntry(catalogDir, entry);
     console.log(`seeded ${entry.id}`);
   }

@@ -1,0 +1,31 @@
+name: Bug report
+description: Something does not work as documented
+labels: []
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      description: What should happen
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: What happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Repro
+      description: Commands, MCP tool calls, or URLs
+      render: bash
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      placeholder: "@real-limitless/skill-flow 0.1.0 or git SHA"

@@ -145,7 +145,7 @@ async function renderSkillDetail() {
   }
   try {
     const e = await loadEntry(id);
-    const installCmd = `npx skill-flow install ${JSON.stringify(e.id)} --target portable --yes`;
+    const installCmd = `npx @real-limitless/skill-flow install ${JSON.stringify(e.id)} --target portable --yes`;
     root.innerHTML = `
       <p class="eyebrow">${escapeHtml(e.provenance || "catalog")} · ${escapeHtml(e.status || "")}</p>
       <h1 class="display" style="max-width: 20ch; font-size: 42px">${escapeHtml(e.name)}</h1>

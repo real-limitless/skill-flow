@@ -13,7 +13,7 @@ import {
   statSync,
   readFileSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -31,14 +31,42 @@ function normalizeBase(b: string): string {
   return b.endsWith("/") ? b.slice(0, -1) : b;
 }
 
-function copyDir(src: string, dest: string): void {
+function sanitizePublishedValue(value: unknown): unknown {
+  if (typeof value === "string") {
+    const posix = value.replace(/\\/g, "/");
+    const m = posix.match(/(?:^|\/)(catalog\/(?:seed|entries)\/.+)$/);
+    if (m) return m[1];
+    if (posix.startsWith(ROOT.replace(/\\/g, "/") + "/")) {
+      return relative(ROOT, value).split("\\").join("/");
+    }
+    return value;
+  }
+  if (Array.isArray(value)) return value.map(sanitizePublishedValue);
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = sanitizePublishedValue(v);
+    }
+    return out;
+  }
+  return value;
+}
+
+function copyDir(src: string, dest: string, sanitizeJson = false): void {
   mkdirSync(dest, { recursive: true });
   for (const name of readdirSync(src)) {
     if (name === "out") continue;
     const s = join(src, name);
     const d = join(dest, name);
-    if (statSync(s).isDirectory()) copyDir(s, d);
-    else cpSync(s, d);
+    if (statSync(s).isDirectory()) copyDir(s, d, sanitizeJson);
+    else if (sanitizeJson && name.endsWith(".json")) {
+      const parsed = JSON.parse(readFileSync(s, "utf8"));
+      writeFileSync(
+        d,
+        JSON.stringify(sanitizePublishedValue(parsed), null, 2) + "\n",
+        "utf8",
+      );
+    } else cpSync(s, d);
   }
 }
 
@@ -49,7 +77,7 @@ function main(): void {
   mkdirSync(outDir, { recursive: true });
 
   for (const name of readdirSync(siteSrc)) {
-    if (name === "out") continue;
+    if (name === "out" || name === "serve.json") continue;
     const s = join(siteSrc, name);
     const d = join(outDir, name);
     if (statSync(s).isDirectory()) copyDir(s, d);
@@ -61,10 +89,19 @@ function main(): void {
   mkdirSync(catOut, { recursive: true });
   for (const name of ["index.json", "meta.json", "schema.json", "blocklist.txt", "README.md"]) {
     const p = join(catalogDir, name);
-    if (existsSync(p)) cpSync(p, join(catOut, name));
+    if (existsSync(p)) {
+      if (name.endsWith(".json")) {
+        const parsed = JSON.parse(readFileSync(p, "utf8"));
+        writeFileSync(
+          join(catOut, name),
+          JSON.stringify(sanitizePublishedValue(parsed), null, 2) + "\n",
+          "utf8",
+        );
+      } else cpSync(p, join(catOut, name));
+    }
   }
   const entries = join(catalogDir, "entries");
-  if (existsSync(entries)) copyDir(entries, join(catOut, "entries"));
+  if (existsSync(entries)) copyDir(entries, join(catOut, "entries"), true);
   const seed = join(catalogDir, "seed");
   if (existsSync(seed)) copyDir(seed, join(catOut, "seed"));
 

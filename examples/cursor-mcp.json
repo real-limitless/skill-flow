@@ -2,7 +2,7 @@
   "mcpServers": {
     "skill-flow": {
       "command": "npx",
-      "args": ["skill-flow", "serve"]
+      "args": ["@real-limitless/skill-flow", "serve"]
     }
   }
 }

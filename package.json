@@ -1,5 +1,5 @@
 {
-  "name": "skill-flow",
+  "name": "@real-limitless/skill-flow",
   "version": "0.1.0",
   "description": "Agent Skills catalog + install plane — search, audit, and install SKILL.md packages into any harness",
   "type": "module",
@@ -10,11 +10,14 @@
   "bin": {
     "skill-flow": "./dist/cli.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && mkdir -p dist/admin && cp -f src/admin/* dist/admin/",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
     "cli": "tsx src/cli.ts",
@@ -25,12 +28,14 @@
     "catalog:seed": "tsx scripts/catalog/seed.ts",
     "catalog:validate": "tsx scripts/catalog/validate.ts",
     "site:build": "tsx scripts/site/build-pages.ts",
-    "site:preview": "npm run catalog:seed && SITE_BASE= npm run site:build && npx --yes serve site/out -p 4173",
+    "site:preview": "npm run catalog:seed && SITE_BASE= npm run site:build && npx --yes serve site/out -p 4173 --config site/serve.json",
     "campaign:capture": "bash docs/campaign/capture.sh"
   },
   "dependencies": {
+    "@hono/node-server": "^1.14.4",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "commander": "^14.0.1",
+    "hono": "^4.13.1",
     "undici": "^6.21.0",
     "yaml": "^2.8.0",
     "zod": "^3.25.76"
@@ -41,5 +46,8 @@
     "tsx": "^4.23.12",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "fast-uri": "^3.1.6"
   }
 }

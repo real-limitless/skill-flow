@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>skill-flow admin</title>
+  <link rel="stylesheet" href="/admin/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark"></div><div class="brand-name">skill<span>-flow</span></div></div>
+      <div class="auth-row">
+        <span id="who" class="muted"></span>
+        <button id="logout" class="pill-btn" type="button">Sign out</button>
+        <button id="refresh" class="pill-btn" type="button">Refresh</button>
+      </div>
+    </header>
+    <p class="eyebrow">Operator console · skill plane</p>
+    <h1 class="display">Catalog, audit,<br /><em>install with confirm.</em></h1>
+    <div class="nav-bar">
+      <nav class="seg tabs">
+        <button type="button" class="seg-btn active" data-tab="status">Status</button>
+        <button type="button" class="seg-btn" data-tab="catalog">Catalog</button>
+        <button type="button" class="seg-btn" data-tab="installs">Installs</button>
+        <button type="button" class="seg-btn" data-tab="harnesses">Harnesses</button>
+        <button type="button" class="seg-btn" data-tab="audit">Audit</button>
+        <button type="button" class="seg-btn" data-tab="operators">Operators</button>
+      </nav>
+      <details class="breakglass">
+        <summary>Break-glass token</summary>
+        <div class="auth-row">
+          <input id="token" type="password" placeholder="Admin token" />
+          <button id="saveToken" class="pill-btn primary" type="button">Save</button>
+        </div>
+      </details>
+    </div>
+    <p id="err" class="err" hidden></p>
+    <main>
+      <section id="tab-status" class="panel active"></section>
+      <section id="tab-catalog" class="panel"></section>
+      <section id="tab-installs" class="panel"></section>
+      <section id="tab-harnesses" class="panel"></section>
+      <section id="tab-audit" class="panel"></section>
+      <section id="tab-operators" class="panel"></section>
+    </main>
+  </div>
+  <script src="/admin/app.js"></script>
+</body>
+</html>
