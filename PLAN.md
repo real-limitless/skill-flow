@@ -25,6 +25,8 @@
 | P3 static site + campaign | done |
 | P4 TUI + HTTP `/mcp` + update | todo |
 
+Competitive map (what similar tools already ship, and the gaps): [docs/competition-feature-gap.md](./docs/competition-feature-gap.md).
+
 ## Architecture
 
 See README. Control plane writes skill trees; harnesses discover natively.
