@@ -70,6 +70,18 @@ const ADMIN_TYPES: Record<string, string> = {
   ".png": "image/png",
 };
 
+/**
+ * login.html and setup.html live in ui/public and are copied into dist/admin
+ * by Vite. Tests and `tsx` run before that build, so serve the source redirects
+ * when no admin bundle is on disk.
+ */
+function sourceAuthRedirect(rel: string): string | null {
+  if (rel !== "login.html" && rel !== "setup.html") return null;
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [join(process.cwd(), "ui/public", rel), join(here, "../../ui/public", rel)];
+  return candidates.find((file) => existsSync(file)) ?? null;
+}
+
 /** Resolve a request path under the admin dir; null on traversal or unknown type. */
 export function adminAssetPath(adminDir: string, rel: string): string | null {
   if (!/^[a-zA-Z0-9._/-]+$/.test(rel) || rel.split("/").some((seg) => seg === ".." || seg === "")) return null;
@@ -97,12 +109,16 @@ export function createApp(opts: HttpAppOpts) {
     return c.html(readFileSync(join(adminDir, "index.html"), "utf8"));
   });
   app.get("/admin/*", (c) => {
-    if (!adminDir) return c.text("not found", 404);
     let rel: string;
     try {
       rel = decodeURIComponent(c.req.path.slice("/admin/".length));
     } catch {
       return c.text("not found", 404);
+    }
+    if (!adminDir) {
+      const redirect = sourceAuthRedirect(rel);
+      if (!redirect) return c.text("not found", 404);
+      return c.body(readFileSync(redirect), 200, { "Content-Type": ADMIN_TYPES[".html"]! });
     }
     const full = adminAssetPath(adminDir, rel);
     if (!full || !existsSync(full)) return c.text("not found", 404);
