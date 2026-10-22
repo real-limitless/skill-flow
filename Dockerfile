@@ -5,6 +5,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 COPY tsconfig.json ./
 COPY src ./src
+COPY ui ./ui
 COPY catalog ./catalog
 COPY scripts/catalog ./scripts/catalog
 RUN npm run build && npm run catalog:seed && npm prune --omit=dev
