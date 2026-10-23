@@ -24,6 +24,7 @@ Sibling: mcp-flow (MCP servers), ansible-flow-mcp (Ansible). Operator logins are
 6. Install must require confirm; never execute skill scripts on install.
 7. No force-push `main`; commit only when user asks.
 8. `/mcp` is never unauthenticated. Human `/admin` uses email/password sessions; `SKILL_FLOW_ADMIN_TOKEN` is break-glass Bearer. Agent HTTP MCP uses the same token (stdio MCP stays process-trust).
+9. No production or environment URLs in code or descriptions.
 
 ## Layout
 
