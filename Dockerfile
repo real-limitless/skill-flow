@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:22-bookworm-slim AS build
+FROM node:22-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS build
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
@@ -10,7 +10,7 @@ COPY catalog ./catalog
 COPY scripts/catalog ./scripts/catalog
 RUN npm run build && npm run catalog:seed && npm prune --omit=dev
 
-FROM node:22-bookworm-slim
+FROM node:22-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d
 WORKDIR /app
 ENV NODE_ENV=production \
     SKILL_FLOW_HOST=0.0.0.0 \
