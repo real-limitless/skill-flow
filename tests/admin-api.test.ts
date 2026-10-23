@@ -22,9 +22,9 @@ afterEach(async () => {
 describe("admin API", () => {
   it("installs and uninstalls a skill with the admin token", async () => {
     const home = await mkdtemp(join(tmpdir(), "sf-admin-home-"));
-    const skillDir = await mkdtemp(join(tmpdir(), "sf-admin-skill-"));
-    const dest = await mkdtemp(join(tmpdir(), "sf-admin-dest-"));
-    temps.push(home, skillDir, dest);
+    const skillDir = join(home, "incoming", "demo");
+    const dest = join(home, "generic-dest");
+    temps.push(home);
     process.env.SKILL_FLOW_HOME = home;
     await writeMinimalSkill(
       skillDir,

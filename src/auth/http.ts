@@ -4,6 +4,12 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 export const SESSION_COOKIE = "sf_op";
 export const SESSION_MAX_AGE = 7 * 24 * 60 * 60;
 
+export function bearerToken(header: string | undefined): string | null {
+  if (!header) return null;
+  const m = /^Bearer\s+(\S+)$/i.exec(header.trim());
+  return m ? m[1]! : null;
+}
+
 export function readSessionToken(c: Context): string | null {
   const v = getCookie(c, SESSION_COOKIE);
   return v && v.trim() ? v.trim() : null;

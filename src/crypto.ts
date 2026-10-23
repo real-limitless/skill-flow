@@ -9,11 +9,16 @@ export function hashToken(token: string): string {
   return createHash("sha256").update(token, "utf8").digest("hex");
 }
 
+/** Length-independent equality. A mismatch still returns false. */
 export function safeEqualStr(a: string, b: string): boolean {
   const ba = Buffer.from(a);
   const bb = Buffer.from(b);
-  if (ba.length !== bb.length) return false;
-  return timingSafeEqual(ba, bb);
+  const len = Math.max(ba.length, bb.length, 1);
+  const pa = Buffer.alloc(len);
+  const pb = Buffer.alloc(len);
+  ba.copy(pa);
+  bb.copy(pb);
+  return timingSafeEqual(pa, pb) && ba.length === bb.length;
 }
 
 const PWD_N = 16384;

@@ -11,6 +11,11 @@ import {
 
 const VERSION = "0.1.0";
 
+/** Unauthenticated liveness. No version, paths, or harness list. */
+export function publicHealth(): { status: "ok" } {
+  return { status: "ok" };
+}
+
 export async function doctorReport(): Promise<Record<string, unknown>> {
   const catalogDir = defaultCatalogDir();
   let meta: unknown = null;
@@ -38,9 +43,8 @@ export function createHealthServer(): Server {
   return createServer(async (req: IncomingMessage, res: ServerResponse) => {
     const path = (req.url ?? "/").split("?", 1)[0];
     if (req.method === "GET" && (path === "/" || path === "/health")) {
-      const report = await doctorReport();
-      const body = JSON.stringify(report, null, 2);
-      res.writeHead(report.ok ? 200 : 503, { "content-type": "application/json" });
+      const body = JSON.stringify(publicHealth());
+      res.writeHead(200, { "content-type": "application/json" });
       res.end(body);
       return;
     }

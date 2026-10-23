@@ -19,8 +19,9 @@ describe("health", () => {
     try {
       const res = await fetch(`http://127.0.0.1:${addr.port}/health`);
       expect(res.ok).toBe(true);
-      const body = (await res.json()) as { ok: boolean };
-      expect(body.ok).toBe(true);
+      const body = (await res.json()) as { status?: string; version?: string };
+      expect(body).toEqual({ status: "ok" });
+      expect(body.version).toBeUndefined();
     } finally {
       await new Promise<void>((resolve, reject) => {
         server.close((err) => (err ? reject(err) : resolve()));

@@ -60,6 +60,7 @@ describe("operator auth", () => {
       body: JSON.stringify({
         email: "ops@example.com",
         password: "password12",
+        setupToken: "break-glass-token",
       }),
     });
     expect(setup.status).toBe(201);
@@ -77,6 +78,7 @@ describe("operator auth", () => {
       body: JSON.stringify({
         email: "other@example.com",
         password: "password12",
+        setupToken: "break-glass-token",
       }),
     });
     expect(again.status).toBe(409);

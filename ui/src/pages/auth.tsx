@@ -29,6 +29,7 @@ const copy: Record<Mode, { eyebrow: string; title: string; description: string; 
 export function AuthPage({ mode }: { mode: Mode }) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [setupToken, setSetupToken] = React.useState("");
   const [error, setError] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const c = copy[mode];
@@ -48,7 +49,12 @@ export function AuthPage({ mode }: { mode: Mode }) {
     setError("");
     setBusy(true);
     try {
-      await postCredentials(mode === "setup" ? "/v1/auth/setup" : "/v1/auth/login", email, password);
+      await postCredentials(
+        mode === "setup" ? "/v1/auth/setup" : "/v1/auth/login",
+        email,
+        password,
+        mode === "setup" ? setupToken : undefined,
+      );
       go("console");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "failed";
@@ -73,6 +79,19 @@ export function AuthPage({ mode }: { mode: Mode }) {
           </CardHeader>
           <CardContent>
             <form onSubmit={onSubmit} className="grid gap-4" noValidate={false}>
+              {mode === "setup" ? (
+                <div className="grid gap-2">
+                  <Label htmlFor="setupToken">Setup token</Label>
+                  <Input
+                    id="setupToken"
+                    type="password"
+                    autoComplete="off"
+                    value={setupToken}
+                    onChange={(e) => setSetupToken(e.target.value)}
+                    placeholder="Required when the server token is set"
+                  />
+                </div>
+              ) : null}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />

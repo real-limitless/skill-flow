@@ -52,11 +52,18 @@ export async function api<T = Record<string, unknown>>(path: string, opts: Reque
   return body as T;
 }
 
-export async function postCredentials(path: "/v1/auth/setup" | "/v1/auth/login", email: string, password: string) {
+export async function postCredentials(
+  path: "/v1/auth/setup" | "/v1/auth/login",
+  email: string,
+  password: string,
+  setupToken?: string,
+) {
+  const payload: { email: string; password: string; setupToken?: string } = { email, password };
+  if (setupToken) payload.setupToken = setupToken;
   const res = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(payload),
   });
   const body = (await res.json().catch(() => ({}))) as { error?: string };
   if (!res.ok) throw new Error(body.error || "failed");

@@ -5,12 +5,15 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import {
+  bearerToken,
   clearSessionCookie,
   originAllowed,
   parseCredentials,
   readSessionToken,
   setSessionCookie,
 } from "../auth/http.js";
+import { AuthRateLimiter, readAuthRateConfig } from "../auth/rate-limit.js";
+import { presentedSetupToken, setupDecision } from "../auth/setup-token.js";
 import { auditPackage } from "../audit/scan.js";
 import { loadIndex, readEntry, searchIndex } from "../catalog/shard.js";
 import { safeEqualStr } from "../crypto.js";
@@ -21,16 +24,24 @@ import {
   uninstallSkill,
 } from "../harness/install.js";
 import { detectHarnesses, HARNESS_REGISTRY } from "../harness/registry.js";
-import { doctorReport } from "../health.js";
+import { doctorReport, publicHealth } from "../health.js";
 import { createSkillFlowServer } from "../mcp/server.js";
 import { resolveSkillSource } from "../package/resolve-source.js";
 import { defaultCatalogDir } from "../paths.js";
-import type { InstallScope, InstallTarget } from "../types.js";
+import type { Context } from "hono";
+import { clientIp } from "./client-ip.js";
+import {
+  parseAuditRequest,
+  parseDeleteInstall,
+  parseInstallRequest,
+} from "./validate-request.js";
 
 export interface HttpAppOpts {
   catalogDir?: string;
   adminToken?: string;
   store: ControlStore;
+  /** Override the peer address. Production uses the socket, not forwarded headers. */
+  clientIp?: (c: Context) => string;
 }
 
 type Vars = {
@@ -38,12 +49,6 @@ type Vars = {
   csrf?: string;
   operatorId?: string;
 };
-
-function bearer(header: string | undefined): string | null {
-  if (!header) return null;
-  const m = /^Bearer\s+(.+)$/i.exec(header.trim());
-  return m ? m[1]!.trim() : null;
-}
 
 function resolveAdminDir(): string | null {
   const here = dirname(fileURLToPath(import.meta.url));
@@ -97,10 +102,13 @@ export function createApp(opts: HttpAppOpts) {
   const adminToken = (opts.adminToken ?? "").trim();
   const app = new Hono<{ Variables: Vars }>();
   const adminDir = resolveAdminDir();
+  const rate = readAuthRateConfig();
+  const limiter = new AuthRateLimiter(rate.maxAttempts, rate.windowMs, rate.lockoutMs);
+  const ipOf = opts.clientIp ?? clientIp;
 
   app.use("*", cors({ origin: "*", allowMethods: ["GET", "POST", "DELETE", "OPTIONS"] }));
 
-  app.get("/health", async (c) => c.json(await doctorReport()));
+  app.get("/health", (c) => c.json(publicHealth()));
   app.get("/", async (c) => c.redirect("/admin/"));
 
   app.get("/admin", (c) => c.redirect("/admin/"));
@@ -134,6 +142,20 @@ export function createApp(opts: HttpAppOpts) {
     return { operator, csrf: sess.csrf };
   };
 
+  const accountKey = (body: unknown): string => {
+    if (!body || typeof body !== "object") return "_";
+    const email = String((body as Record<string, unknown>).email ?? "")
+      .trim()
+      .toLowerCase();
+    if (!email || email.length > 320) return "_";
+    return email;
+  };
+
+  const tooMany = (c: Context, seconds: number) => {
+    c.header("Retry-After", String(seconds));
+    return c.json({ error: "too many attempts" }, 429);
+  };
+
   app.get("/v1/auth/status", (c) =>
     c.json({
       setupRequired: store.countOperators() === 0,
@@ -145,23 +167,60 @@ export function createApp(opts: HttpAppOpts) {
   );
 
   app.post("/v1/auth/setup", async (c) => {
+    const body = await c.req.json().catch(() => ({}));
+    const ip = ipOf(c);
+    const account = accountKey(body);
+    const blocked = limiter.retryAfterSec(ip, account);
+    if (blocked) return tooMany(c, blocked);
     if (!originAllowed(c)) return c.json({ error: "forbidden origin" }, 403);
+    const gate = setupDecision(
+      adminToken,
+      presentedSetupToken({
+        body,
+        authorization: c.req.header("authorization"),
+        setupHeader: c.req.header("x-setup-token"),
+      }),
+    );
+    if (!gate.ok) {
+      const retry = limiter.fail(ip, account);
+      if (retry) return tooMany(c, retry);
+      return c.json({ error: gate.error }, 403);
+    }
     if (store.countOperators() > 0) {
       return c.json({ error: "setup already completed" }, 409);
     }
-    const creds = parseCredentials(await c.req.json().catch(() => ({})));
-    if ("error" in creds) return c.json({ error: creds.error }, 400);
+    const creds = parseCredentials(body);
+    if ("error" in creds) {
+      const retry = limiter.fail(ip, account);
+      if (retry) return tooMany(c, retry);
+      return c.json({ error: creds.error }, 400);
+    }
     const out = issue(c, creds.email, creds.password);
+    limiter.success(account);
     store.writeAudit("operator.setup", { email: out.operator.email });
     return c.json(out, 201);
   });
 
   app.post("/v1/auth/login", async (c) => {
+    const body = await c.req.json().catch(() => ({}));
+    const ip = ipOf(c);
+    const account = accountKey(body);
+    const blocked = limiter.retryAfterSec(ip, account);
+    if (blocked) return tooMany(c, blocked);
     if (!originAllowed(c)) return c.json({ error: "forbidden origin" }, 403);
-    const creds = parseCredentials(await c.req.json().catch(() => ({})));
-    if ("error" in creds) return c.json({ error: creds.error }, 400);
+    const creds = parseCredentials(body);
+    if ("error" in creds) {
+      const retry = limiter.fail(ip, account);
+      if (retry) return tooMany(c, retry);
+      return c.json({ error: creds.error }, 400);
+    }
     const operator = store.authenticateOperator(creds.email, creds.password);
-    if (!operator) return c.json({ error: "invalid credentials" }, 401);
+    if (!operator) {
+      const retry = limiter.fail(ip, creds.email);
+      if (retry) return tooMany(c, retry);
+      return c.json({ error: "invalid credentials" }, 401);
+    }
+    limiter.success(creds.email);
     const sess = store.createSession(operator);
     setSessionCookie(c, sess.token);
     store.writeAudit("operator.login", { email: operator.email });
@@ -169,6 +228,7 @@ export function createApp(opts: HttpAppOpts) {
   });
 
   app.post("/v1/auth/logout", (c) => {
+    if (!originAllowed(c)) return c.json({ error: "forbidden origin" }, 403);
     const tok = readSessionToken(c);
     if (tok) store.revokeSession(tok);
     clearSessionCookie(c);
@@ -183,7 +243,7 @@ export function createApp(opts: HttpAppOpts) {
 
   const v1 = new Hono<{ Variables: Vars }>();
   v1.use("*", async (c, next) => {
-    const token = bearer(c.req.header("authorization"));
+    const token = bearerToken(c.req.header("authorization"));
     if (token && adminToken && safeEqualStr(token, adminToken)) {
       c.set("auth", "admin");
       await next();
@@ -227,25 +287,21 @@ export function createApp(opts: HttpAppOpts) {
   });
 
   v1.post("/installs", async (c) => {
-    const body = (await c.req.json().catch(() => ({}))) as {
-      source?: string;
-      target?: string;
-      scope?: InstallScope;
-      genericPath?: string;
-    };
-    if (!body.source) return c.json({ error: "source required" }, 400);
+    const parsed = await parseInstallRequest(await c.req.json().catch(() => ({})), catalogDir);
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
     try {
       const result = await installSkill(
         {
-          source: body.source,
-          target: (body.target as InstallTarget) || "portable",
-          scope: body.scope || "user",
-          genericPath: body.genericPath,
+          source: parsed.value.source,
+          target: parsed.value.target || "portable",
+          scope: parsed.value.scope || "user",
+          genericPath: parsed.value.genericPath,
+          subpath: parsed.value.subpath,
           confirm: true,
         },
         { catalogLookup: (id) => readEntry(catalogDir, id) },
       );
-      store.writeAudit("install", { name: result.name, source: body.source });
+      store.writeAudit("install", { name: result.name, source: parsed.value.source });
       return c.json({ result }, 201);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -254,14 +310,22 @@ export function createApp(opts: HttpAppOpts) {
   });
 
   v1.delete("/installs/:name", async (c) => {
-    const name = c.req.param("name");
+    const parsed = await parseDeleteInstall(
+      {
+        name: c.req.param("name"),
+        target: c.req.query("target"),
+        genericPath: c.req.query("genericPath"),
+      },
+      catalogDir,
+    );
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
     try {
       const result = await uninstallSkill({
-        name,
-        target: c.req.query("target") || undefined,
-        genericPath: c.req.query("genericPath") || undefined,
+        name: parsed.value.name,
+        target: parsed.value.target,
+        genericPath: parsed.value.genericPath,
       });
-      store.writeAudit("uninstall", { name });
+      store.writeAudit("uninstall", { name: parsed.value.name });
       return c.json(result);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -282,14 +346,15 @@ export function createApp(opts: HttpAppOpts) {
   });
 
   v1.post("/audit", async (c) => {
-    const body = (await c.req.json().catch(() => ({}))) as { source?: string };
-    if (!body.source) return c.json({ error: "source required" }, 400);
+    const parsed = await parseAuditRequest(await c.req.json().catch(() => ({})), catalogDir);
+    if (!parsed.ok) return c.json({ error: parsed.error }, 400);
     try {
-      const { pkg } = await resolveSkillSource(body.source, {
+      const { pkg } = await resolveSkillSource(parsed.value.source, {
         catalogLookup: (id) => readEntry(catalogDir, id),
+        subpath: parsed.value.subpath,
       });
       const report = await auditPackage(pkg);
-      store.writeAudit("audit", { source: body.source, risk: report.risk });
+      store.writeAudit("audit", { source: parsed.value.source, risk: report.risk });
       return c.json({ report });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -322,11 +387,14 @@ export function createApp(opts: HttpAppOpts) {
   app.route("/v1", v1);
 
   app.all("/mcp", async (c) => {
-    const token = bearer(c.req.header("authorization"));
+    const token = bearerToken(c.req.header("authorization"));
     const sess = store.authenticateSession(readSessionToken(c) ?? "");
     const adminOk = Boolean(token && adminToken && safeEqualStr(token, adminToken));
     if (!adminOk && !sess) {
       return c.json({ error: "unauthorized" }, 401);
+    }
+    if (!adminOk && !originAllowed(c)) {
+      return c.json({ error: "forbidden origin" }, 403);
     }
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
