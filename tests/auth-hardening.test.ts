@@ -132,7 +132,7 @@ describe("auth rate limit", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Test-Ip": "10.0.0.1",
+        "X-Test-Ip": "client-a.example.com",
         "X-Setup-Token": "setup-token-value",
       },
       body: JSON.stringify({ email: "ops@example.com", password: "password12" }),
@@ -146,28 +146,28 @@ describe("auth rate limit", () => {
         body: JSON.stringify({ email, password: "wrong-password" }),
       });
 
-    expect((await fail("10.0.0.1", "ops@example.com")).status).toBe(401);
-    const locked = await fail("10.0.0.1", "ops@example.com");
+    expect((await fail("client-a.example.com", "ops@example.com")).status).toBe(401);
+    const locked = await fail("client-a.example.com", "ops@example.com");
     expect(locked.status).toBe(429);
     expect(Number(locked.headers.get("retry-after"))).toBeGreaterThan(0);
 
-    const otherAccountSameIp = await fail("10.0.0.1", "other@example.com");
+    const otherAccountSameIp = await fail("client-a.example.com", "other@example.com");
     expect(otherAccountSameIp.status).toBe(429);
 
-    const sameAccountOtherIp = await fail("10.0.0.2", "ops@example.com");
+    const sameAccountOtherIp = await fail("client-b.example.com", "ops@example.com");
     expect(sameAccountOtherIp.status).toBe(429);
 
-    const fresh = await fail("10.0.0.3", "third@example.com");
+    const fresh = await fail("client-c.example.com", "third@example.com");
     expect(fresh.status).toBe(401);
   });
 });
 
 describe("path and url validation", () => {
   it("accepts only https git URLs", () => {
-    expect(isHttpsGitUrl("https://github.com/acme/skill.git")).toBe(true);
-    expect(isHttpsGitUrl("http://github.com/acme/skill.git")).toBe(false);
-    expect(isHttpsGitUrl("git@github.com:acme/skill.git")).toBe(false);
-    expect(isHttpsGitUrl("https://user:secret@github.com/acme/skill.git")).toBe(false);
+    expect(isHttpsGitUrl("https://skill-flow.example.com/skill.git")).toBe(true);
+    expect(isHttpsGitUrl("http://skill-flow.example.com/skill.git")).toBe(false);
+    expect(isHttpsGitUrl("git@skill-flow.example.com:skill.git")).toBe(false);
+    expect(isHttpsGitUrl("https://user:secret@skill-flow.example.com/skill.git")).toBe(false);
   });
 
   it("rejects traversal, symlink escape, http urls, and unsafe names", async () => {
@@ -240,7 +240,7 @@ describe("path and url validation", () => {
     expect(outsideDest.status).toBe(400);
 
     const httpsShape = await parseInstallRequest(
-      { source: "https://github.com/acme/skill.git", subpath: "skills" },
+      { source: "https://skill-flow.example.com/skill.git", subpath: "skills" },
       join(home, "catalog"),
     );
     expect(httpsShape.ok).toBe(true);
@@ -281,7 +281,7 @@ describe("origin checks and health", () => {
 
   it("rejects a mismatched origin on cookie /mcp and logout, not on bearer", async () => {
     const { app } = await boot({ adminToken: "setup-token-value" });
-    const setup = await app.request("http://127.0.0.1:8788/v1/auth/setup", {
+    const setup = await app.request("http://skill-flow.example.com/v1/auth/setup", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Setup-Token": "setup-token-value" },
       body: JSON.stringify({ email: "ops@example.com", password: "password12" }),
@@ -289,34 +289,34 @@ describe("origin checks and health", () => {
     expect(setup.status).toBe(201);
     const cookie = cookieHeader(setup);
 
-    const mcp = await app.request("http://127.0.0.1:8788/mcp", {
+    const mcp = await app.request("http://skill-flow.example.com/mcp", {
       method: "POST",
       headers: {
         Cookie: cookie,
-        Origin: "https://evil.example",
+        Origin: "https://evil.example.com",
         "Content-Type": "application/json",
       },
       body: "{}",
     });
     expect(mcp.status).toBe(403);
 
-    const bearer = await app.request("http://127.0.0.1:8788/mcp", {
+    const bearer = await app.request("http://skill-flow.example.com/mcp", {
       method: "POST",
       headers: {
         Authorization: "Bearer setup-token-value",
-        Origin: "https://evil.example",
+        Origin: "https://evil.example.com",
         "Content-Type": "application/json",
       },
       body: "{}",
     });
     expect(bearer.status).not.toBe(403);
 
-    const logout = await app.request("http://127.0.0.1:8788/v1/auth/logout", {
+    const logout = await app.request("http://skill-flow.example.com/v1/auth/logout", {
       method: "POST",
-      headers: { Cookie: cookie, Origin: "https://evil.example" },
+      headers: { Cookie: cookie, Origin: "https://evil.example.com" },
     });
     expect(logout.status).toBe(403);
-    const me = await app.request("http://127.0.0.1:8788/v1/auth/me", {
+    const me = await app.request("http://skill-flow.example.com/v1/auth/me", {
       headers: { Cookie: cookie },
     });
     expect(me.status).toBe(200);
