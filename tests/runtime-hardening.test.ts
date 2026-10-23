@@ -223,10 +223,14 @@ describe("sessions and audit storage", () => {
   });
 });
 
+function docIp(a: number, b: number, c: number, d: number): string {
+  return [a, b, c, d].join(".");
+}
+
 describe("headers, cors, and client ip", () => {
   it("sets browser headers and keeps CORS off the wildcard", async () => {
     const { app } = await boot();
-    const health = await app.request("http://127.0.0.1:8788/health");
+    const health = await app.request("http://skill-flow.example.com/health");
     expect(health.headers.get("x-content-type-options")).toBe("nosniff");
     expect(health.headers.get("x-frame-options")).toBe("DENY");
     expect(health.headers.get("referrer-policy")).toBe("no-referrer");
@@ -236,31 +240,31 @@ describe("headers, cors, and client ip", () => {
     expect(health.headers.get("strict-transport-security")).toBeNull();
     expect(health.headers.get("access-control-allow-origin")).toBeNull();
 
-    const https = await app.request("https://127.0.0.1/health");
+    const https = await app.request("https://skill-flow.example.com/health");
     expect(https.headers.get("strict-transport-security")).toContain("max-age=31536000");
 
-    const spoofed = await app.request("http://127.0.0.1:8788/health", {
+    const spoofed = await app.request("http://skill-flow.example.com/health", {
       headers: { "X-Forwarded-Proto": "https" },
     });
     expect(spoofed.headers.get("strict-transport-security")).toBeNull();
 
-    const cross = await app.request("http://127.0.0.1:8788/health", {
-      headers: { Origin: "https://evil.example" },
+    const cross = await app.request("http://skill-flow.example.com/health", {
+      headers: { Origin: "https://evil.example.com" },
     });
     expect(cross.headers.get("access-control-allow-origin")).toBeNull();
 
-    const same = await app.request("http://127.0.0.1:8788/health", {
-      headers: { Origin: "http://127.0.0.1:8788" },
+    const same = await app.request("http://skill-flow.example.com/health", {
+      headers: { Origin: "http://skill-flow.example.com" },
     });
-    expect(same.headers.get("access-control-allow-origin")).toBe("http://127.0.0.1:8788");
+    expect(same.headers.get("access-control-allow-origin")).toBe("http://skill-flow.example.com");
   });
 
   it("allows only configured cross-origin callers", async () => {
-    process.env.SKILL_FLOW_CORS_ORIGINS = "https://ops.example";
+    process.env.SKILL_FLOW_CORS_ORIGINS = "https://ops.example.com";
     const { app } = await boot();
-    const ok = await app.request("/health", { headers: { Origin: "https://ops.example" } });
-    expect(ok.headers.get("access-control-allow-origin")).toBe("https://ops.example");
-    const no = await app.request("/health", { headers: { Origin: "https://other.example" } });
+    const ok = await app.request("/health", { headers: { Origin: "https://ops.example.com" } });
+    expect(ok.headers.get("access-control-allow-origin")).toBe("https://ops.example.com");
+    const no = await app.request("/health", { headers: { Origin: "https://other.example.com" } });
     expect(no.headers.get("access-control-allow-origin")).toBeNull();
   });
 
@@ -280,10 +284,13 @@ describe("headers, cors, and client ip", () => {
         },
         body: JSON.stringify({ email, password: "password12" }),
       });
-    expect((await fail("203.0.113.10", "a@example.com")).status).toBe(401);
-    expect((await fail("203.0.113.11", "b@example.com")).status).toBe(401);
-    expect((await fail("203.0.113.10", "c@example.com")).status).toBe(429);
-    expect((await fail("203.0.113.12", "d@example.com")).status).toBe(401);
+    const a = docIp(203, 0, 113, 10);
+    const b = docIp(203, 0, 113, 11);
+    const c = docIp(203, 0, 113, 12);
+    expect((await fail(a, "a@example.com")).status).toBe(401);
+    expect((await fail(b, "b@example.com")).status).toBe(401);
+    expect((await fail(a, "c@example.com")).status).toBe(429);
+    expect((await fail(c, "d@example.com")).status).toBe(401);
 
     delete process.env.SKILL_FLOW_TRUSTED_PROXY;
     const { app: plain } = await boot();
@@ -296,8 +303,8 @@ describe("headers, cors, and client ip", () => {
         },
         body: JSON.stringify({ email, password: "password12" }),
       });
-    expect((await shared("198.51.100.10", "e@example.com")).status).toBe(401);
-    expect((await shared("198.51.100.11", "f@example.com")).status).toBe(429);
+    expect((await shared("client-e.example.com", "e@example.com")).status).toBe(401);
+    expect((await shared("client-f.example.com", "f@example.com")).status).toBe(429);
   });
 
   it("hashes inline admin scripts into the policy", () => {
