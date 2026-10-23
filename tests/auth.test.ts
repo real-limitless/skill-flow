@@ -122,7 +122,8 @@ describe("operator auth", () => {
 
     const loginPage = await app.request("/admin/login.html");
     expect(loginPage.status).toBe(200);
-    expect(await loginPage.text()).toContain("Sign in");
+    // login.html is now a redirect into the React SPA (hash route).
+    expect(await loginPage.text()).toContain("/admin/#/login");
   });
 
   it("break-glass admin token can list operators", async () => {

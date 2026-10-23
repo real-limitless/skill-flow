@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -48,15 +48,47 @@ function bearer(header: string | undefined): string | null {
 function resolveAdminDir(): string | null {
   const here = dirname(fileURLToPath(import.meta.url));
   const candidates = [
+    process.env.SKILL_FLOW_ADMIN_DIR,
     join(here, "../admin"),
-    join(here, "../../src/admin"),
-    join(process.cwd(), "src/admin"),
+    join(here, "../../dist/admin"),
     join(process.cwd(), "dist/admin"),
-  ];
+  ].filter((d): d is string => Boolean(d));
   for (const dir of candidates) {
-    if (existsSync(join(dir, "index.html"))) return dir;
+    if (existsSync(join(dir, "index.html"))) return resolve(dir);
   }
   return null;
+}
+
+const ADMIN_TYPES: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".woff2": "font/woff2",
+  ".woff": "font/woff",
+  ".ico": "image/x-icon",
+  ".png": "image/png",
+};
+
+/**
+ * login.html and setup.html live in ui/public and are copied into dist/admin
+ * by Vite. Tests and `tsx` run before that build, so serve the source redirects
+ * when no admin bundle is on disk.
+ */
+function sourceAuthRedirect(rel: string): string | null {
+  if (rel !== "login.html" && rel !== "setup.html") return null;
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [join(process.cwd(), "ui/public", rel), join(here, "../../ui/public", rel)];
+  return candidates.find((file) => existsSync(file)) ?? null;
+}
+
+/** Resolve a request path under the admin dir; null on traversal or unknown type. */
+export function adminAssetPath(adminDir: string, rel: string): string | null {
+  if (!/^[a-zA-Z0-9._/-]+$/.test(rel) || rel.split("/").some((seg) => seg === ".." || seg === "")) return null;
+  if (!ADMIN_TYPES[extname(rel)]) return null;
+  const full = resolve(adminDir, rel);
+  if (!full.startsWith(adminDir + sep)) return null;
+  return full;
 }
 
 export function createApp(opts: HttpAppOpts) {
@@ -76,23 +108,23 @@ export function createApp(opts: HttpAppOpts) {
     if (!adminDir) return c.json({ error: "admin UI not found" }, 404);
     return c.html(readFileSync(join(adminDir, "index.html"), "utf8"));
   });
-  app.get("/admin/:file", (c) => {
-    if (!adminDir) return c.text("not found", 404);
-    const file = c.req.param("file");
-    if (!/^[a-zA-Z0-9._-]+\.(html|js|css)$/.test(file)) {
-      return c.text("not found", 404);
-    }
+  app.get("/admin/*", (c) => {
+    let rel: string;
     try {
-      const body = readFileSync(join(adminDir, file), "utf8");
-      const type = file.endsWith(".js")
-        ? "application/javascript; charset=utf-8"
-        : file.endsWith(".css")
-          ? "text/css; charset=utf-8"
-          : "text/html; charset=utf-8";
-      return c.body(body, 200, { "Content-Type": type });
+      rel = decodeURIComponent(c.req.path.slice("/admin/".length));
     } catch {
       return c.text("not found", 404);
     }
+    if (!adminDir) {
+      const redirect = sourceAuthRedirect(rel);
+      if (!redirect) return c.text("not found", 404);
+      return c.body(readFileSync(redirect), 200, { "Content-Type": ADMIN_TYPES[".html"]! });
+    }
+    const full = adminAssetPath(adminDir, rel);
+    if (!full || !existsSync(full)) return c.text("not found", 404);
+    const headers: Record<string, string> = { "Content-Type": ADMIN_TYPES[extname(full)]! };
+    if (rel.startsWith("assets/")) headers["Cache-Control"] = "public, max-age=31536000, immutable";
+    return c.body(readFileSync(full), 200, headers);
   });
 
   const issue = (c: Parameters<typeof setSessionCookie>[0], email: string, password: string) => {
