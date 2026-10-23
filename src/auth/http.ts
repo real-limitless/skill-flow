@@ -1,5 +1,6 @@
 import type { Context } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import { requestHost } from "../http/security.js";
 
 export const SESSION_COOKIE = "sf_op";
 export const SESSION_MAX_AGE = 7 * 24 * 60 * 60;
@@ -34,8 +35,7 @@ export function originAllowed(c: Context): boolean {
   const origin = c.req.header("origin");
   if (!origin) return true;
   try {
-    const host = c.req.header("host") ?? "";
-    return new URL(origin).host === host;
+    return new URL(origin).host === requestHost(c.req.header("host"), c.req.url);
   } catch {
     return false;
   }

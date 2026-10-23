@@ -15,8 +15,12 @@ WORKDIR /app
 ENV NODE_ENV=production \
     SKILL_FLOW_HOST=0.0.0.0 \
     SKILL_FLOW_PORT=8788 \
-    SKILL_FLOW_CATALOG_DIR=/app/catalog
+    SKILL_FLOW_CATALOG_DIR=/app/catalog \
+    SKILL_FLOW_HOME=/data
 COPY --from=build /app /app
+RUN mkdir -p /data && chown node:node /data
+VOLUME /data
+USER node
 EXPOSE 8788
 HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=8 \
   CMD node -e "fetch('http://127.0.0.1:8788/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
