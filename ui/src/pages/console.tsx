@@ -233,8 +233,17 @@ function AuditTab({ onErr, onInfo }: { onErr: Report; onInfo: Report }) {
   );
 }
 
+async function revokeSessions(id: string, onErr: Report) {
+  try {
+    await api(`/v1/operators/${encodeURIComponent(id)}/sessions/revoke`, { method: "POST", body: "{}" });
+    toast.success("Sessions revoked");
+  } catch (err) {
+    onErr((err as Error).message);
+  }
+}
+
 function OperatorsTab({ onErr }: { onErr: Report }) {
-  const [data, reload] = useLoad(() => api<{ operators?: { email: string }[] }>("/v1/operators"), [], onErr);
+  const [data, reload] = useLoad(() => api<{ operators?: { id: string; email: string }[] }>("/v1/operators"), [], onErr);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   async function add(e: React.FormEvent) {
@@ -253,11 +262,18 @@ function OperatorsTab({ onErr }: { onErr: Report }) {
     <div className="grid gap-4">
       {!data ? <Loading /> : (
         <Table>
-          <TableHeader><TableRow><TableHead>Email</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Email</TableHead><TableHead className="w-0" /></TableRow></TableHeader>
           <TableBody>
             {(data.operators || []).length
-              ? data.operators!.map((o) => <TableRow key={o.email}><TableCell>{o.email}</TableCell></TableRow>)
-              : <Empty cols={1} text="None" />}
+              ? data.operators!.map((o) => (
+                <TableRow key={o.id}>
+                  <TableCell>{o.email}</TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" onClick={() => void revokeSessions(o.id, onErr)}>Revoke sessions</Button>
+                  </TableCell>
+                </TableRow>
+              ))
+              : <Empty cols={2} text="None" />}
           </TableBody>
         </Table>
       )}
@@ -359,6 +375,12 @@ export function ConsolePage() {
     go("login");
   }
 
+  async function signOutEverywhere() {
+    await api("/v1/auth/revoke-sessions", { method: "POST", body: "{}" }).catch(() => undefined);
+    clearToken();
+    go("login");
+  }
+
   const current = TABS.find((t) => t.id === tab)!;
   const panelKey = `${tab}-${nonce}`;
 
@@ -408,6 +430,9 @@ export function ConsolePage() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel className="truncate">{who}</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              {who?.includes("@") ? (
+                <DropdownMenuItem onSelect={() => void signOutEverywhere()}>Sign out everywhere</DropdownMenuItem>
+              ) : null}
               <DropdownMenuItem onSelect={() => void signOut()}><LogOut /> Sign out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

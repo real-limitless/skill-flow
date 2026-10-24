@@ -83,6 +83,16 @@ export class ControlStore {
       );
       CREATE INDEX IF NOT EXISTS idx_sf_sess_hash ON operator_sessions(token_hash);
       CREATE INDEX IF NOT EXISTS idx_sf_audit_ts ON audit_events(ts DESC);
+      CREATE TRIGGER IF NOT EXISTS audit_events_no_update
+      BEFORE UPDATE ON audit_events
+      BEGIN
+        SELECT RAISE(ABORT, 'audit_events is append-only');
+      END;
+      CREATE TRIGGER IF NOT EXISTS audit_events_no_delete
+      BEFORE DELETE ON audit_events
+      BEGIN
+        SELECT RAISE(ABORT, 'audit_events is append-only');
+      END;
     `);
   }
 
@@ -177,6 +187,16 @@ export class ControlStore {
         "UPDATE operator_sessions SET revoked_at = ? WHERE token_hash = ? AND revoked_at IS NULL",
       )
       .run(nowIso(), hashToken(token));
+  }
+
+  /** Revoke every live session for an operator. Audit rows are not touched. */
+  revokeOperatorSessions(operatorId: string): number {
+    const result = this.db
+      .prepare(
+        "UPDATE operator_sessions SET revoked_at = ? WHERE operator_id = ? AND revoked_at IS NULL",
+      )
+      .run(nowIso(), operatorId);
+    return Number(result.changes);
   }
 
   writeAudit(action: string, detail?: Record<string, unknown> | null): void {

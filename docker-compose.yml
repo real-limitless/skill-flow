@@ -7,9 +7,22 @@
 name: skill-flow
 
 services:
+  # One-shot: the app runs as the non-root node user (uid 1000). Volumes created
+  # by older root images are owned by root, so fix ownership before start.
+  skill-flow-data-init:
+    image: busybox:1.36
+    user: "0:0"
+    command: ["chown", "-R", "1000:1000", "/data"]
+    volumes:
+      - skill-flow-home:/data
+    restart: "no"
+
   skill-flow:
     build: .
     image: ${SKILL_FLOW_IMAGE:-skill-flow:${COMPOSE_PROJECT_NAME:-local}}
+    depends_on:
+      skill-flow-data-init:
+        condition: service_completed_successfully
     expose:
       - "8788"
     env_file:
