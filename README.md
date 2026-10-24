@@ -61,7 +61,7 @@ The container listens on **8788** (`/health`, `/admin`, `/mcp`). Compose **expos
 | `SKILL_FLOW_HOME` | State directory. Compose sets `/data` (the named volume). |
 | `SKILL_FLOW_DB_PATH` | Operator sqlite. Default `$SKILL_FLOW_HOME/control.sqlite`. |
 | `SKILL_FLOW_CATALOG_DIR` | Catalog directory. Compose sets `/app/catalog`. |
-| `SKILL_FLOW_ADMIN_TOKEN` | Break-glass Bearer for `/v1` and HTTP `/mcp`. Not the browser login password. `/health` and `/admin` setup do not need it. |
+| `SKILL_FLOW_ADMIN_TOKEN` | Break-glass Bearer for `/v1` and HTTP `/mcp`, and the setup token for the first operator. When it is set, `POST /v1/auth/setup` must present it. When it is unset outside development, setup is refused. Not the browser login password. `/health` does not need it. |
 | `GITHUB_TOKEN` | Optional. Raises GitHub API rate limits for remote skill fetches. |
 
 MCP stdio is still `npx @real-limitless/skill-flow serve` (or `docker compose exec skill-flow node dist/cli.js serve`). Unscoped `npx skill-flow` is a **different** npm package.
@@ -127,7 +127,7 @@ npx @real-limitless/skill-flow serve --http --host 127.0.0.1 --port 8788
 Accounts are **local to this skill-flow instance** (not shared with mcp-flow, ansible-flow, wiki-flow, or CleanFlow). After the first operator exists, signup is closed.
 
 - Browser `/admin` uses email/password + httpOnly cookie (`sf_op`) and CSRF on mutations.
-- `SKILL_FLOW_ADMIN_TOKEN` is break-glass **Bearer** for `/v1` and `/mcp` (not a login password).
+- `SKILL_FLOW_ADMIN_TOKEN` is break-glass **Bearer** for `/v1` and `/mcp`, and the setup token for the first operator. When it is set, setup must present it. When it is unset outside development, setup is refused. It is not a login password.
 - HTTP `/mcp` is never unauthenticated. Stdio `serve` remains process-trust (no web login).
 - Control DB: `$SKILL_FLOW_HOME/control.sqlite` (or `SKILL_FLOW_DB_PATH`). Catalog JSON and disk installs are unchanged.
 
