@@ -4,7 +4,7 @@ import type { Context } from "hono";
 /** sha256 hashes of inline scripts, matching what a browser hashes. */
 export function inlineScriptHashes(html: string): string[] {
   const hashes: string[] = [];
-  const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
+  const re = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
   for (const match of html.matchAll(re)) {
     const attrs = match[1] ?? "";
     const body = match[2] ?? "";
