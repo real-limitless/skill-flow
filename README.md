@@ -68,7 +68,7 @@ MCP stdio is still `npx @real-limitless/skill-flow serve` (or `docker compose ex
 
 Host Node (contributors):
 
-Requirements: **Node.js ≥ 22**, `git` on PATH (for remote installs).
+Requirements: **Node.js ≥ 22.13** (`node:sqlite` needs unflagged support; Vite 7 also wants ≥22.12), `git` on PATH (for remote installs).
 
 ```bash
 npm install

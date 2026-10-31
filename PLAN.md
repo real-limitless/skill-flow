@@ -9,7 +9,7 @@
 | Concern | Choice |
 | --- | --- |
 | Name | skill-flow |
-| Stack | TypeScript / Node ≥ 22 |
+| Stack | TypeScript / Node ≥ 22.13 (`node:sqlite` needs unflagged support; Vite 7 also wants ≥22.12) |
 | v1 | Catalog + MCP install plane first |
 | Default target | portable (`.agents/skills`) |
 | Catalog SoT | Seeds + public git (factory); no marketplace HTML scrape |

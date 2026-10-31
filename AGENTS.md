@@ -1,6 +1,6 @@
 # skill-flow: agent guide
 
-Self-hosted **Agent Skills catalog + install plane**. TypeScript / Node ≥ 22. MCP stdio + CLI + HTTP `/mcp` + browser `/admin`.
+Self-hosted **Agent Skills catalog + install plane**. TypeScript / Node ≥ 22.13 (`node:sqlite` needs unflagged support; Vite 7 also wants ≥22.12). MCP stdio + CLI + HTTP `/mcp` + browser `/admin`.
 
 ## What this is
 
